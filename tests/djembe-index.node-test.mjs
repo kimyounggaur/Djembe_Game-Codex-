@@ -131,3 +131,16 @@ test("start flow routes through rhythm selection and supports selected rhythm ch
   assert.match(html, /currentMode/);
   assert.match(html, /updateBestRecord\s*\(/);
 });
+
+test("rhythm selection layout stays readable inside the narrow game frame", async () => {
+  const html = await readIndex();
+
+  assert.match(html, /\.rhythm-select\s*\{[\s\S]*?word-break:\s*keep-all/);
+  assert.match(html, /\.rhythm-detail\s*\{[\s\S]*?order:\s*-1[\s\S]*?position:\s*static/);
+  assert.match(html, /\.rhythm-card-list\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
+  assert.doesNotMatch(
+    html,
+    /@media\s*\(min-width:\s*760px\)\s*\{[\s\S]*?\.rhythm-layout[\s\S]*?grid-template-columns:\s*minmax\(0,\s*1\.2fr\)\s*minmax\(260px,\s*0\.8fr\)/,
+    "desktop viewport rules must not force a two-column rhythm layout inside the 520px game frame",
+  );
+});

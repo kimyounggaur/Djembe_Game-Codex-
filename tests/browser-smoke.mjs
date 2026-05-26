@@ -165,7 +165,19 @@ const rhythmState = await evaluate(`({
   state: window.__DJEMBE_GAME__.stateManager.state,
   visible: document.getElementById('rhythmSelectScreen').classList.contains('active'),
   cardCount: document.querySelectorAll('[data-rhythm-id]').length,
-  selected: window.__DJEMBE_GAME__.selectedRhythmId
+  selected: window.__DJEMBE_GAME__.selectedRhythmId,
+  layout: (() => {
+    const detail = document.getElementById('rhythmDetail').getBoundingClientRect();
+    const firstCard = document.querySelector('[data-rhythm-id]').getBoundingClientRect();
+    const list = document.getElementById('rhythmCardList').getBoundingClientRect();
+    return {
+      detailTop: Math.round(detail.top),
+      firstCardTop: Math.round(firstCard.top),
+      detailWidth: Math.round(detail.width),
+      cardWidth: Math.round(firstCard.width),
+      listWidth: Math.round(list.width)
+    };
+  })()
 })`);
 
 const previewRect = await evaluate(`(() => {
@@ -247,6 +259,9 @@ if (!readyState.canvas || !readyState.readyActive || readyState.state !== "ready
 }
 if (!rhythmState.visible || rhythmState.cardCount < 12) {
   throw new Error("Rhythm selection screen did not show the rhythm library");
+}
+if (rhythmState.layout.detailTop > rhythmState.layout.firstCardTop || rhythmState.layout.cardWidth < 300 || rhythmState.layout.detailWidth < 300) {
+  throw new Error(`Rhythm selection layout is too cramped: ${JSON.stringify(rhythmState.layout)}`);
 }
 if (playState.state !== "playing") {
   throw new Error("Game did not reach playing state after countdown");
