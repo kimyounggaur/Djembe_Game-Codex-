@@ -1,0 +1,2469 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <title>젬베 리듬</title>
+  <link rel="icon" href="data:," />
+  <style>
+    :root {
+      --app-height: 100vh;
+      --ink: #171412;
+      --muted: #6f655f;
+      --line: rgba(40, 31, 25, 0.14);
+      --accent: #d84f36;
+      --bass: #2f7a63;
+      --tone: #d49a2f;
+      --slap: #d84f62;
+      --panel: rgba(255, 255, 255, 0.92);
+      --shadow: 0 18px 50px rgba(35, 25, 18, 0.16);
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
+      background: #f7f4ef;
+      color: var(--ink);
+    }
+
+    body {
+      min-height: var(--app-height);
+      display: grid;
+      place-items: center;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    .game-frame {
+      position: relative;
+      width: min(100vw, 520px);
+      height: min(var(--app-height), calc(min(100vw, 520px) * 16 / 9));
+      max-height: var(--app-height);
+      background: #fffdf9;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 28px 80px rgba(29, 22, 18, 0.18);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    @media (min-aspect-ratio: 9 / 16) {
+      .game-frame {
+        height: min(var(--app-height), 920px);
+        width: min(calc(var(--app-height) * 9 / 16), 520px);
+      }
+    }
+
+    #gameCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #fffaf3;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .screen,
+    .modal,
+    .practice-toolbar,
+    .pause-overlay,
+    .orientation-note {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 160ms ease, visibility 160ms ease;
+    }
+
+    .screen.active,
+    .modal.active,
+    .practice-toolbar.active,
+    .pause-overlay.active,
+    .orientation-note.active {
+      pointer-events: auto;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(22px, 5vh, 42px) clamp(18px, 6vw, 34px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 249, 240, 0.9));
+    }
+
+    .screen.loading {
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+      background: #fff;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.12));
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(42px, 10vw, 62px);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: clamp(28px, 7vw, 42px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 10px 0 22px;
+      color: var(--muted);
+      font-size: clamp(15px, 3.7vw, 18px);
+      line-height: 1.45;
+    }
+
+    .hero-drum {
+      position: absolute;
+      left: 50%;
+      bottom: -5%;
+      width: min(86%, 430px);
+      max-height: 48%;
+      object-fit: contain;
+      transform: translateX(-50%);
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .learn-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 14px 0 18px;
+    }
+
+    .learn-card {
+      min-height: 112px;
+      padding: 10px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.76);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(43, 31, 23, 0.07);
+    }
+
+    .learn-card img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .learn-card strong {
+      font-size: 13px;
+    }
+
+    .learn-card span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    .button-stack {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .icon-btn {
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-weight: 800;
+      transition: transform 130ms ease, box-shadow 130ms ease, background 130ms ease;
+    }
+
+    .btn-primary {
+      background: #1f1712;
+      color: #fffaf2;
+      box-shadow: 0 14px 32px rgba(31, 23, 18, 0.22);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--line);
+      color: #2b241f;
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover,
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(31, 23, 18, 0.14);
+    }
+
+    .hint {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .loading-icon {
+      width: 92px;
+      height: 92px;
+      object-fit: contain;
+    }
+
+    .progress-track {
+      width: min(260px, 76%);
+      height: 8px;
+      border-radius: 999px;
+      background: #eee6dc;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #d84f36, #d49a2f);
+      transition: width 120ms ease;
+    }
+
+    .modal {
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(28, 22, 19, 0.32);
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-panel,
+    .result-panel,
+    .pause-card {
+      width: min(100%, 440px);
+      max-height: calc(100% - 24px);
+      overflow: auto;
+      padding: 18px;
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+    }
+
+    .modal-head,
+    .result-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .modal-title,
+    .result-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 22px;
+    }
+
+    .modal-title img,
+    .result-title img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .settings-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #fff;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+      gap: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      font-weight: 800;
+    }
+
+    .toggle-row input {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--accent);
+    }
+
+    .help-list {
+      display: grid;
+      gap: 10px;
+      color: #3a3029;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .result-stat {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .result-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .result-stat strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .feedback {
+      padding: 12px;
+      border-radius: 8px;
+      background: #fff8ed;
+      border: 1px solid rgba(212, 154, 47, 0.25);
+      line-height: 1.45;
+      color: #4a3323;
+    }
+
+    .practice-toolbar {
+      inset: auto 12px 12px 12px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      z-index: 4;
+    }
+
+    .practice-toolbar.active {
+      display: flex;
+    }
+
+    .pause-overlay {
+      display: grid;
+      place-items: center;
+      background: rgba(28, 22, 19, 0.22);
+      backdrop-filter: blur(5px);
+    }
+
+    .pause-card {
+      text-align: center;
+    }
+
+    .pause-card p {
+      color: var(--muted);
+      margin: 10px 0 16px;
+    }
+
+    .orientation-note {
+      inset: auto 10px env(safe-area-inset-bottom) 10px;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(31, 23, 18, 0.86);
+      color: #fff;
+      text-align: center;
+      font-size: 13px;
+      z-index: 6;
+    }
+
+    @media (max-width: 360px) {
+      .learn-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .learn-card {
+        min-height: 72px;
+        flex-direction: row;
+        text-align: left;
+        justify-content: flex-start;
+        gap: 10px;
+      }
+
+      .button-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game-frame" id="gameFrame">
+    <canvas id="gameCanvas" aria-label="젬베 리듬 게임 화면"></canvas>
+
+    <section class="screen loading active" id="loadingScreen" aria-live="polite">
+      <img class="loading-icon" id="loadingIcon" alt="" />
+      <h2>젬베 리듬 준비 중...</h2>
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="loadingProgress"></div>
+      </div>
+      <p class="hint" id="loadingText">에셋을 확인하고 있어요.</p>
+    </section>
+
+    <section class="screen" id="readyScreen">
+      <img class="hero-drum" id="heroDrum" alt="" />
+      <div class="brand-row">
+        <img class="brand-icon" id="titleIcon" alt="" />
+        <h1>젬베 리듬</h1>
+      </div>
+      <p class="subtitle">손끝으로 배우는 아프리카 리듬</p>
+
+      <div class="learn-cards" aria-label="젬베 타법 안내">
+        <div class="learn-card">
+          <img id="cardSlap" alt="" />
+          <strong>Slap</strong>
+          <span>D · 손가락 끝으로 날카롭게</span>
+        </div>
+        <div class="learn-card">
+          <img id="cardBass" alt="" />
+          <strong>Bass</strong>
+          <span>Space · 손바닥 중앙으로 묵직하게</span>
+        </div>
+        <div class="learn-card">
+          <img id="cardTone" alt="" />
+          <strong>Tone</strong>
+          <span>K · 손가락 아래쪽으로 맑게</span>
+        </div>
+      </div>
+
+      <div class="button-stack">
+        <button class="btn-primary" id="startButton" type="button">게임 시작</button>
+        <div class="button-row">
+          <button class="btn-secondary" id="practiceButton" type="button">연습 모드</button>
+          <button class="btn-secondary" id="settingsButton" type="button">설정</button>
+          <button class="btn-secondary" id="helpButton" type="button">조작법</button>
+        </div>
+      </div>
+      <p class="hint" id="readyHint">D = Slap · Space = Bass · K = Tone<br />모바일에서는 화면 왼쪽/가운데/오른쪽을 터치하세요.</p>
+    </section>
+
+    <section class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-panel">
+        <div class="modal-head">
+          <div class="modal-title" id="settingsTitle">
+            <img class="brand-icon-small" id="settingsIcon" alt="" />
+            설정
+          </div>
+          <button class="icon-btn" id="settingsClose" type="button" aria-label="설정 닫기">×</button>
+        </div>
+        <div class="settings-grid">
+          <div class="field">
+            <label for="masterVolume">Master Volume <span id="masterVolumeLabel">90%</span></label>
+            <input id="masterVolume" type="range" min="0" max="1" step="0.01" />
+          </div>
+          <div class="field">
+            <label for="sfxVolume">SFX Volume <span id="sfxVolumeLabel">95%</span></label>
+            <input id="sfxVolume" type="range" min="0" max="1" step="0.01" />
+          </div>
+          <div class="field">
+            <label for="bgmVolume">BGM Volume <span id="bgmVolumeLabel">36%</span></label>
+            <input id="bgmVolume" type="range" min="0" max="1" step="0.01" />
+          </div>
+          <div class="field">
+            <label for="noteSpeed">Note Speed</label>
+            <select id="noteSpeed">
+              <option value="slow">느림</option>
+              <option value="normal">보통</option>
+              <option value="fast">빠름</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="inputOffset">Input Offset <span id="inputOffsetLabel">0ms</span></label>
+            <input id="inputOffset" type="range" min="-150" max="150" step="1" />
+          </div>
+          <div class="field">
+            <label for="particleQuality">Particle Quality</label>
+            <select id="particleQuality">
+              <option value="low">낮음</option>
+              <option value="medium">보통</option>
+              <option value="high">높음</option>
+            </select>
+          </div>
+          <label class="toggle-row" for="reducedMotion">
+            Reduced Motion
+            <input id="reducedMotion" type="checkbox" />
+          </label>
+          <label class="toggle-row" for="showHitWindows">
+            Show Hit Windows
+            <input id="showHitWindows" type="checkbox" />
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="modal-panel">
+        <div class="modal-head">
+          <div class="modal-title" id="helpTitle">
+            <img id="helpIcon" alt="" />
+            조작법
+          </div>
+          <button class="icon-btn" id="helpClose" type="button" aria-label="조작법 닫기">×</button>
+        </div>
+        <div class="help-list">
+          <p><strong>D</strong> 또는 왼쪽 터치: Slap. 손가락 끝으로 날카롭게 치는 느낌입니다.</p>
+          <p><strong>Space</strong> 또는 가운데 터치: Bass. 손바닥 중앙으로 묵직하게 누릅니다.</p>
+          <p><strong>K</strong> 또는 오른쪽 터치: Tone. 손가락 아래쪽으로 맑게 울립니다.</p>
+          <p><strong>Enter</strong>: 시작 또는 다시 하기. <strong>Esc</strong>: 일시정지와 재개.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="modal" id="resultScreen" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <div class="result-panel">
+        <div class="result-head">
+          <div class="result-title" id="resultTitle">
+            <img id="resultIcon" alt="" />
+            게임 종료
+          </div>
+          <strong id="resultGrade">S</strong>
+        </div>
+        <div class="result-grid" id="resultGrid"></div>
+        <p class="feedback" id="resultFeedback"></p>
+        <div class="button-stack">
+          <button class="btn-primary" id="retryButton" type="button">다시 하기</button>
+          <div class="button-row">
+            <button class="btn-secondary" id="resultPracticeButton" type="button">연습 모드</button>
+            <button class="btn-secondary" id="homeButton" type="button">처음으로</button>
+            <button class="btn-secondary" id="resultSettingsButton" type="button">설정</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="pause-overlay" id="pauseOverlay">
+      <div class="pause-card">
+        <h2>일시정지</h2>
+        <p>Esc 또는 아래 버튼으로 다시 이어갈 수 있어요.</p>
+        <button class="btn-primary" id="resumeButton" type="button">계속하기</button>
+      </div>
+    </div>
+
+    <div class="practice-toolbar" id="practiceToolbar">
+      <button class="btn-secondary" id="practiceHomeButton" type="button">처음으로</button>
+      <button class="btn-secondary" id="practiceSettingsButton" type="button">설정</button>
+    </div>
+
+    <div class="orientation-note" id="orientationNote">가로보다 세로 화면을 권장합니다.</div>
+  </main>
+
+  <script>
+    "use strict";
+
+    const DEBUG = false;
+
+    const STATE = {
+      BOOT: "boot",
+      READY: "ready",
+      COUNTDOWN: "countdown",
+      PLAYING: "playing",
+      PAUSED: "paused",
+      RESULT: "result",
+      PRACTICE: "practice",
+    };
+
+    const ASSETS = {
+      images: {
+        introDrum: "assets/vertical-shot-drum-white.jpg",
+        playDrum: "assets/Djembe(크몽)[실사].png",
+        hitMap: "assets/젬베 게임 앱 Source.png",
+        icon: "assets/젬베_아이콘_크몽__채색_-removebg-preview.png",
+        noteBass: "assets/젬베 게임 앱 Source02-1.png",
+        noteTone: "assets/젬베 게임 앱 Source02-2.png",
+        noteSlap: "assets/젬베 게임 앱 Source02-3.png",
+      },
+      audio: {
+        slap: "assets/Djembe-slap.wav",
+        bass: "assets/Djembe-Bass.wav",
+        tone: "assets/Djembe_Mid.wav",
+        hit: "assets/Djembe_hit20.wav",
+        bgm: "assets/Djembe_slice_sample.wav",
+        countdown: "generated",
+        miss: "generated",
+      },
+    };
+
+    const CONFIG = {
+      baseWidth: 1080,
+      baseHeight: 1920,
+      lanes: {
+        slap: { id: "slap", label: "SLAP", key: "KeyD", keyLabel: "D", xRatio: 0.24, color: "#d84f62", light: "#fff0f3", symbol: "S" },
+        bass: { id: "bass", label: "BASS", key: "Space", keyLabel: "Space", xRatio: 0.50, color: "#2f7a63", light: "#effaf5", symbol: "B" },
+        tone: { id: "tone", label: "TONE", key: "KeyK", keyLabel: "K", xRatio: 0.76, color: "#d49a2f", light: "#fff8e9", symbol: "T" },
+      },
+      note: {
+        radiusRatio: 0.055,
+        minRadius: 34,
+        maxRadius: 54,
+        approachTimeMs: 2600,
+        spawnOffsetY: 120,
+        minGlobalGapMs: 420,
+        minSameLaneGapMs: 720,
+      },
+      judgement: {
+        perfectMs: 45,
+        greatMs: 90,
+        goodMs: 140,
+        missMs: 180,
+      },
+      scoring: {
+        perfect: 1000,
+        great: 700,
+        good: 400,
+        comboBonus: [
+          { combo: 50, bonus: 0.15 },
+          { combo: 30, bonus: 0.10 },
+          { combo: 10, bonus: 0.05 },
+        ],
+      },
+      settings: {
+        noteSpeedMs: { slow: 3000, normal: 2600, fast: 2100 },
+        particleLimit: { high: 350, medium: 220, low: 100 },
+      },
+      timing: {
+        countdownMs: 4100,
+        debounceMs: 50,
+        resultDelayMs: 900,
+      },
+    };
+
+    const CHARTS = {
+      tutorial: {
+        id: "tutorial",
+        title: "Tutorial",
+        bpm: 72,
+        durationMs: 39000,
+        notes: createTutorialNotes(),
+      },
+      groove1: {
+        id: "groove1",
+        title: "Groove 1",
+        bpm: 84,
+        durationMs: 54000,
+        notes: createGrooveOneNotes(),
+      },
+      groove2: {
+        id: "groove2",
+        title: "Groove 2",
+        bpm: 96,
+        durationMs: 62000,
+        notes: createGrooveTwoNotes(),
+      },
+    };
+
+    function createTutorialNotes() {
+      const notes = [];
+      for (let beat = 4; beat <= 12; beat += 2) notes.push({ beat, lane: "bass" });
+      for (let beat = 14; beat <= 22; beat += 2) notes.push({ beat, lane: "tone" });
+      for (let beat = 24; beat <= 32; beat += 2) notes.push({ beat, lane: "slap" });
+      [
+        [34, "bass"], [36, "tone"], [38, "bass"], [40, "slap"],
+        [42, "bass"], [44, "tone"], [46, "slap"], [48, "bass"],
+      ].forEach(([beat, lane]) => notes.push({ beat, lane }));
+      return notes;
+    }
+
+    function createGrooveOneNotes() {
+      const notes = [];
+      for (let beat = 4; beat <= 72; beat += 4) {
+        notes.push({ beat, lane: "bass" });
+        notes.push({ beat: beat + 1.5, lane: "tone" });
+        notes.push({ beat: beat + 3, lane: beat % 8 === 0 ? "slap" : "bass" });
+      }
+      return notes;
+    }
+
+    function createGrooveTwoNotes() {
+      const notes = [];
+      for (let beat = 4; beat <= 88; beat += 4) {
+        notes.push({ beat, lane: "bass" });
+        notes.push({ beat: beat + 1.25, lane: beat % 12 === 0 ? "slap" : "tone" });
+        notes.push({ beat: beat + 2.5, lane: "bass" });
+        if (beat % 8 === 0) notes.push({ beat: beat + 3.5, lane: "slap" });
+      }
+      return notes;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+    }
+
+    function beatToMs(beat, bpm) {
+      return beat * (60000 / bpm);
+    }
+
+    function validateLaneIds(chart) {
+      const valid = new Set(Object.keys(CONFIG.lanes));
+      const invalid = chart.notes.filter((note) => !valid.has(note.lane));
+      if (invalid.length) {
+        console.warn(`[Chart] ${chart.title}: 알 수 없는 lane이 있어 bass로 보정합니다.`, invalid);
+        invalid.forEach((note) => { note.lane = "bass"; });
+      }
+      return invalid.length === 0;
+    }
+
+    function validateNoOverlappingNotes(chart) {
+      const byTime = new Map();
+      chart.notes.forEach((note) => {
+        const time = Math.round(beatToMs(note.beat, chart.bpm));
+        const key = String(time);
+        byTime.set(key, (byTime.get(key) || 0) + 1);
+      });
+      const overlaps = [...byTime.values()].filter((count) => count > 1).length;
+      if (overlaps) {
+        console.warn(`[Chart] ${chart.title}: 같은 시간 노트 ${overlaps}개를 자동 보정합니다.`);
+      }
+      return overlaps === 0;
+    }
+
+    function validateChartSpacing(chart) {
+      const minGlobal = CONFIG.note.minGlobalGapMs;
+      const minSame = CONFIG.note.minSameLaneGapMs;
+      const lastLaneTime = new Map();
+      let lastAnyTime = -Infinity;
+      let changed = false;
+
+      validateLaneIds(chart);
+      chart.notes.sort((a, b) => beatToMs(a.beat, chart.bpm) - beatToMs(b.beat, chart.bpm));
+
+      chart.notes.forEach((note) => {
+        let hitTimeMs = beatToMs(note.beat, chart.bpm);
+        const laneLast = lastLaneTime.get(note.lane) ?? -Infinity;
+        const earliest = Math.max(lastAnyTime + minGlobal, laneLast + minSame);
+        if (hitTimeMs < earliest) {
+          hitTimeMs = earliest;
+          note.beat = hitTimeMs / (60000 / chart.bpm);
+          changed = true;
+        }
+        lastAnyTime = hitTimeMs;
+        lastLaneTime.set(note.lane, hitTimeMs);
+      });
+
+      if (changed) {
+        console.warn(`[Chart] ${chart.title}: 초보자 친화 간격으로 노트를 자동 보정했습니다.`);
+      }
+      validateNoOverlappingNotes(chart);
+      return !changed;
+    }
+
+    class AssetLoader {
+      constructor(manifest) {
+        this.manifest = manifest;
+        this.images = new Map();
+        this.failed = [];
+        this.progress = 0;
+      }
+
+      async loadImages(onProgress) {
+        const entries = Object.entries(this.manifest.images);
+        if (!entries.length) return;
+        let completed = 0;
+
+        await Promise.all(entries.map(([name, url]) => new Promise((resolve) => {
+          const image = new Image();
+          image.decoding = "async";
+          image.onload = () => {
+            this.images.set(name, image);
+            completed += 1;
+            this.progress = completed / entries.length;
+            onProgress?.(this.progress, `${name} 로딩 완료`);
+            resolve();
+          };
+          image.onerror = () => {
+            console.warn(`[AssetLoader] 이미지 누락 또는 로딩 실패: ${url}`);
+            this.images.set(name, null);
+            this.failed.push(url);
+            completed += 1;
+            this.progress = completed / entries.length;
+            onProgress?.(this.progress, `${name} fallback 사용`);
+            resolve();
+          };
+          image.src = url;
+        })));
+      }
+
+      getImage(name) {
+        return this.images.get(name) || null;
+      }
+    }
+
+    class AudioEngine {
+      constructor(manifest, calibration) {
+        this.manifest = manifest;
+        this.calibration = calibration;
+        this.ctx = null;
+        this.buffers = new Map();
+        this.masterGain = null;
+        this.sfxGain = null;
+        this.bgmGain = null;
+        this.bgmSource = null;
+        this.bgmTimer = null;
+        this.ready = false;
+      }
+
+      async init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) {
+            console.warn("[AudioEngine] Web Audio API를 사용할 수 없어 무음 fallback으로 진행합니다.");
+            return;
+          }
+          this.ctx = new AudioContext();
+          this.masterGain = this.ctx.createGain();
+          this.sfxGain = this.ctx.createGain();
+          this.bgmGain = this.ctx.createGain();
+          this.sfxGain.connect(this.masterGain);
+          this.bgmGain.connect(this.masterGain);
+          this.masterGain.connect(this.ctx.destination);
+        }
+        if (this.ctx.state !== "running") await this.ctx.resume();
+        this.applySettings(this.calibration.settings);
+        if (!this.ready) await this.loadAll();
+        this.ready = true;
+      }
+
+      async loadAll() {
+        const entries = Object.entries(this.manifest.audio).filter(([, url]) => url !== "generated");
+        await Promise.all(entries.map(([name, url]) => this.loadBuffer(name, url)));
+      }
+
+      async loadBuffer(name, url) {
+        if (!this.ctx || this.buffers.has(name)) return;
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+          const arrayBuffer = await response.arrayBuffer();
+          const buffer = await this.ctx.decodeAudioData(arrayBuffer);
+          this.buffers.set(name, buffer);
+        } catch (error) {
+          console.warn(`[AudioEngine] 오디오 누락 또는 디코딩 실패: ${url}. Oscillator fallback 사용.`, error);
+          this.buffers.set(name, null);
+        }
+      }
+
+      applySettings(settings) {
+        if (!this.ctx) return;
+        this.masterGain.gain.value = settings.masterVolume;
+        this.sfxGain.gain.value = settings.sfxVolume;
+        this.bgmGain.gain.value = settings.bgmVolume;
+      }
+
+      play(name, options = {}) {
+        if (!this.ctx || this.ctx.state !== "running") return;
+        const buffer = this.buffers.get(name);
+        const gainValue = options.gain ?? 1;
+        if (buffer) {
+          const source = this.ctx.createBufferSource();
+          const gain = this.ctx.createGain();
+          source.buffer = buffer;
+          source.playbackRate.value = options.rate ?? 1;
+          gain.gain.value = gainValue;
+          source.connect(gain);
+          gain.connect(this.sfxGain);
+          source.start();
+          return;
+        }
+        this.playFallback(name, gainValue);
+      }
+
+      playFallback(name, gainValue = 1) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+        const laneTone = {
+          slap: { freq: 520, end: 310, type: "triangle", attack: 0.006, decay: 0.09 },
+          bass: { freq: 110, end: 62, type: "sine", attack: 0.008, decay: 0.18 },
+          tone: { freq: 310, end: 220, type: "sine", attack: 0.007, decay: 0.13 },
+          hit: { freq: 820, end: 560, type: "triangle", attack: 0.004, decay: 0.07 },
+          miss: { freq: 95, end: 80, type: "sawtooth", attack: 0.004, decay: 0.08 },
+          countdown: { freq: 660, end: 520, type: "sine", attack: 0.005, decay: 0.12 },
+        }[name] || { freq: 240, end: 180, type: "sine", attack: 0.006, decay: 0.1 };
+
+        osc.type = laneTone.type;
+        osc.frequency.setValueAtTime(laneTone.freq, now);
+        osc.frequency.exponentialRampToValueAtTime(Math.max(30, laneTone.end), now + laneTone.decay);
+        filter.type = "lowpass";
+        filter.frequency.value = name === "slap" ? 2400 : 1300;
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.32 * gainValue, now + laneTone.attack);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + laneTone.decay);
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.sfxGain);
+        osc.start(now);
+        osc.stop(now + laneTone.decay + 0.03);
+      }
+
+      playCountdown(step) {
+        if (!this.ctx) return;
+        if (step === "START") {
+          this.playFallback("hit", 1.2);
+          setTimeout(() => this.playFallback("countdown", 0.8), 70);
+          return;
+        }
+        this.playFallback("countdown", 0.78);
+      }
+
+      playHit(lane, judgement) {
+        if (judgement === "perfect" || judgement === "great") {
+          this.play("hit", { gain: judgement === "perfect" ? 0.32 : 0.18, rate: judgement === "perfect" ? 1.08 : 1 });
+        }
+      }
+
+      playMiss() {
+        this.playFallback("miss", 0.38);
+      }
+
+      startBgm(chart) {
+        if (!this.ctx || this.ctx.state !== "running") return;
+        this.stopBgm();
+        const buffer = this.buffers.get("bgm");
+        if (buffer) {
+          this.bgmSource = this.ctx.createBufferSource();
+          this.bgmSource.buffer = buffer;
+          this.bgmSource.loop = true;
+          this.bgmSource.connect(this.bgmGain);
+          this.bgmSource.start();
+        } else {
+          this.startGeneratedBgm(chart);
+        }
+      }
+
+      startGeneratedBgm(chart) {
+        const intervalMs = Math.max(250, 60000 / chart.bpm);
+        let tick = 0;
+        this.bgmTimer = window.setInterval(() => {
+          if (!this.ctx || this.ctx.state !== "running") return;
+          const name = tick % 4 === 0 ? "bass" : tick % 2 === 0 ? "tone" : "slap";
+          this.playFallback(name, tick % 4 === 0 ? 0.22 : 0.12);
+          tick += 1;
+        }, intervalMs);
+      }
+
+      stopBgm() {
+        if (this.bgmSource) {
+          try { this.bgmSource.stop(); } catch (_) {}
+          this.bgmSource.disconnect();
+          this.bgmSource = null;
+        }
+        if (this.bgmTimer) {
+          clearInterval(this.bgmTimer);
+          this.bgmTimer = null;
+        }
+      }
+
+      getCurrentAudioTimeMs() {
+        return this.ctx ? this.ctx.currentTime * 1000 : 0;
+      }
+    }
+
+    class GameStateManager {
+      constructor() {
+        this.state = STATE.BOOT;
+        this.previousState = null;
+      }
+
+      set(nextState) {
+        this.previousState = this.state;
+        this.state = nextState;
+      }
+
+      is(state) {
+        return this.state === state;
+      }
+    }
+
+    class CalibrationManager {
+      constructor() {
+        this.storageKey = "djembe-rhythm-settings-v1";
+        this.settings = {
+          masterVolume: 0.9,
+          sfxVolume: 0.95,
+          bgmVolume: 0.36,
+          noteSpeed: "normal",
+          inputOffset: 0,
+          particleQuality: "high",
+          reducedMotion: false,
+          showHitWindows: false,
+        };
+      }
+
+      load() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(this.storageKey) || "{}");
+          this.settings = { ...this.settings, ...saved };
+        } catch (error) {
+          console.warn("[CalibrationManager] 설정을 불러오지 못해 기본값을 사용합니다.", error);
+        }
+      }
+
+      save() {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.settings));
+      }
+
+      update(partial) {
+        this.settings = { ...this.settings, ...partial };
+        this.save();
+      }
+
+      getApproachTimeMs() {
+        return CONFIG.settings.noteSpeedMs[this.settings.noteSpeed] || CONFIG.note.approachTimeMs;
+      }
+
+      getInputOffsetMs() {
+        return Number(this.settings.inputOffset) || 0;
+      }
+    }
+
+    class ChartManager {
+      constructor(charts) {
+        this.charts = charts;
+        Object.values(this.charts).forEach((chart) => validateChartSpacing(chart));
+      }
+
+      getChart(id = "tutorial") {
+        const source = this.charts[id] || this.charts.tutorial;
+        const prepared = {
+          ...source,
+          notes: source.notes.map((note, index) => ({
+            id: `${source.id}-${index}`,
+            lane: note.lane,
+            beat: note.beat,
+            hitTimeMs: beatToMs(note.beat, source.bpm),
+            state: "pending",
+            judgement: null,
+          })),
+        };
+        validateChartSpacing(prepared);
+        prepared.notes.forEach((note, index) => {
+          note.id = `${prepared.id}-${index}`;
+          note.hitTimeMs = beatToMs(note.beat, prepared.bpm);
+        });
+        prepared.lastNoteMs = prepared.notes.length ? prepared.notes[prepared.notes.length - 1].hitTimeMs : 0;
+        return prepared;
+      }
+    }
+
+    class NoteManager {
+      constructor() {
+        this.notes = [];
+      }
+
+      load(chart) {
+        this.notes = chart.notes.map((note) => ({ ...note }));
+      }
+
+      reset() {
+        this.notes = [];
+      }
+
+      getActiveNotes(currentTimeMs, approachTimeMs) {
+        return this.notes.filter((note) => {
+          if (note.state !== "pending") return note.state === "hitAnim" || note.state === "missAnim";
+          return note.hitTimeMs >= currentTimeMs - CONFIG.judgement.missMs - 220
+            && note.hitTimeMs <= currentTimeMs + approachTimeMs + 160;
+        });
+      }
+
+      getPosition(note, currentTimeMs, metrics, approachTimeMs) {
+        const progress = 1 - (note.hitTimeMs - currentTimeMs) / approachTimeMs;
+        const y = lerp(metrics.spawnY, metrics.judgementY, progress);
+        return { x: metrics.laneX[note.lane], y, progress: clamp(progress, 0, 1.25) };
+      }
+
+      findClosest(laneId, currentTimeMs) {
+        let closest = null;
+        let smallestDiff = Infinity;
+        this.notes.forEach((note) => {
+          if (note.lane !== laneId || note.state !== "pending") return;
+          const diff = Math.abs(note.hitTimeMs - currentTimeMs);
+          if (diff < smallestDiff && diff <= CONFIG.judgement.missMs) {
+            closest = note;
+            smallestDiff = diff;
+          }
+        });
+        return closest ? { note: closest, diffMs: smallestDiff } : null;
+      }
+
+      consume(note, judgement) {
+        note.state = judgement === "miss" ? "missAnim" : "hitAnim";
+        note.judgement = judgement;
+        note.animStartedAt = performance.now();
+      }
+
+      collectAutoMisses(currentTimeMs) {
+        const missed = [];
+        this.notes.forEach((note) => {
+          if (note.state === "pending" && currentTimeMs > note.hitTimeMs + CONFIG.judgement.missMs) {
+            note.state = "missAnim";
+            note.judgement = "miss";
+            note.animStartedAt = performance.now();
+            missed.push(note);
+          }
+        });
+        return missed;
+      }
+
+      pruneAnimations(now) {
+        this.notes = this.notes.filter((note) => {
+          if (note.state === "pending") return true;
+          return now - (note.animStartedAt || now) < 420;
+        });
+      }
+
+      hasPendingNotes() {
+        return this.notes.some((note) => note.state === "pending");
+      }
+    }
+
+    class ScoringSystem {
+      constructor() {
+        this.reset(0);
+      }
+
+      reset(totalNotes = 0) {
+        this.score = 0;
+        this.combo = 0;
+        this.maxCombo = 0;
+        this.perfectCount = 0;
+        this.greatCount = 0;
+        this.goodCount = 0;
+        this.missCount = 0;
+        this.totalNotes = totalNotes;
+        this.hitNotes = 0;
+        this.weightedHitScore = 0;
+        this.laneStats = {
+          slap: { hit: 0, miss: 0 },
+          bass: { hit: 0, miss: 0 },
+          tone: { hit: 0, miss: 0 },
+        };
+      }
+
+      judge(diffMs) {
+        if (diffMs <= CONFIG.judgement.perfectMs) return "perfect";
+        if (diffMs <= CONFIG.judgement.greatMs) return "great";
+        if (diffMs <= CONFIG.judgement.goodMs) return "good";
+        return "miss";
+      }
+
+      record(laneId, judgement) {
+        const scoreMap = { perfect: CONFIG.scoring.perfect, great: CONFIG.scoring.great, good: CONFIG.scoring.good, miss: 0 };
+        const weightMap = { perfect: 1, great: 0.75, good: 0.45, miss: 0 };
+        if (judgement === "miss") {
+          this.missCount += 1;
+          this.combo = 0;
+          this.laneStats[laneId].miss += 1;
+          return 0;
+        }
+
+        this[`${judgement}Count`] += 1;
+        this.combo += 1;
+        this.maxCombo = Math.max(this.maxCombo, this.combo);
+        this.hitNotes += 1;
+        this.weightedHitScore += weightMap[judgement];
+        this.laneStats[laneId].hit += 1;
+
+        const bonusRule = CONFIG.scoring.comboBonus.find((rule) => this.combo >= rule.combo);
+        const bonus = bonusRule ? 1 + bonusRule.bonus : 1;
+        const gained = Math.round(scoreMap[judgement] * bonus);
+        this.score += gained;
+        return gained;
+      }
+
+      get accuracy() {
+        if (!this.totalNotes) return 100;
+        return clamp((this.weightedHitScore / this.totalNotes) * 100, 0, 100);
+      }
+
+      getGrade() {
+        const accuracy = this.accuracy;
+        if (accuracy >= 95) return "S";
+        if (accuracy >= 88) return "A";
+        if (accuracy >= 78) return "B";
+        if (accuracy >= 65) return "C";
+        return "D";
+      }
+
+      getWeakLane() {
+        const entries = Object.entries(this.laneStats).map(([lane, stats]) => {
+          const total = stats.hit + stats.miss;
+          return { lane, rate: total ? stats.hit / total : 1, total };
+        }).filter((item) => item.total > 0);
+        if (!entries.length) return "bass";
+        entries.sort((a, b) => a.rate - b.rate);
+        return entries[0].lane;
+      }
+
+      getLaneRate(lane) {
+        const stats = this.laneStats[lane];
+        const total = stats.hit + stats.miss;
+        return total ? Math.round((stats.hit / total) * 100) : 100;
+      }
+
+      getFeedback() {
+        const grade = this.getGrade();
+        const weak = CONFIG.lanes[this.getWeakLane()].label;
+        const gradeText = {
+          S: "완벽한 그루브! 젬베 마스터에 가까워졌어요.",
+          A: "훌륭해요. 리듬이 안정적입니다.",
+          B: "좋아요. 몇 박자만 더 정확히 맞춰보세요.",
+          C: "기본은 잡혔어요. Bass부터 천천히 연습해봐요.",
+          D: "괜찮아요. 연습 모드에서 손 위치를 먼저 익혀봐요.",
+        }[grade];
+        return `${gradeText} 다음에는 ${weak} 타이밍을 조금 더 연습해보세요.`;
+      }
+
+      getResultData() {
+        const bestScore = Math.max(Number(localStorage.getItem("djembe-best-score") || 0), this.score);
+        const bestCombo = Math.max(Number(localStorage.getItem("djembe-best-combo") || 0), this.maxCombo);
+        localStorage.setItem("djembe-best-score", String(bestScore));
+        localStorage.setItem("djembe-best-combo", String(bestCombo));
+        return {
+          score: this.score,
+          bestScore,
+          maxCombo: this.maxCombo,
+          bestCombo,
+          perfect: this.perfectCount,
+          great: this.greatCount,
+          good: this.goodCount,
+          miss: this.missCount,
+          accuracy: this.accuracy,
+          grade: this.getGrade(),
+          weakLane: this.getWeakLane(),
+          laneRates: {
+            slap: this.getLaneRate("slap"),
+            bass: this.getLaneRate("bass"),
+            tone: this.getLaneRate("tone"),
+          },
+          feedback: this.getFeedback(),
+        };
+      }
+    }
+
+    class ParticleSystem {
+      constructor(calibration) {
+        this.calibration = calibration;
+        this.particles = [];
+      }
+
+      emitHit(x, y, laneId, judgement) {
+        const settings = this.calibration.settings;
+        const reduced = settings.reducedMotion;
+        const lane = CONFIG.lanes[laneId];
+        const countMap = { perfect: 32, great: 18, good: 10, miss: 8 };
+        const baseCount = countMap[judgement] || 12;
+        const count = reduced ? Math.ceil(baseCount * 0.35) : baseCount;
+        const colors = [lane.color, "#ffffff", "#f3d17b", "#ff8e8e"];
+        for (let i = 0; i < count; i += 1) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = (judgement === "perfect" ? 480 : 300) * (0.45 + Math.random() * 0.85);
+          this.particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 120,
+            life: 0,
+            maxLife: 480 + Math.random() * 380,
+            size: 8 + Math.random() * 18,
+            rotation: Math.random() * Math.PI,
+            rotationSpeed: -4 + Math.random() * 8,
+            shape: this.pickShape(judgement),
+            color: colors[Math.floor(Math.random() * colors.length)],
+            gravity: judgement === "miss" ? 420 : 280,
+            drag: 0.986,
+            alpha: 1,
+          });
+        }
+        if (judgement === "perfect" && !reduced) {
+          this.emitWave(x, y, lane.color, 2);
+        }
+        this.limit();
+      }
+
+      pickShape(judgement) {
+        if (judgement === "miss") return "dust";
+        if (judgement === "perfect") return ["star", "heart", "spark", "diamond"][Math.floor(Math.random() * 4)];
+        if (judgement === "great") return ["star", "circle", "diamond"][Math.floor(Math.random() * 3)];
+        return ["circle", "spark"][Math.floor(Math.random() * 2)];
+      }
+
+      emitWave(x, y, color, count = 1) {
+        for (let i = 0; i < count; i += 1) {
+          this.particles.push({
+            x,
+            y,
+            vx: 0,
+            vy: 0,
+            life: -i * 120,
+            maxLife: 620,
+            size: 60 + i * 20,
+            rotation: 0,
+            rotationSpeed: 0,
+            shape: "wave",
+            color,
+            gravity: 0,
+            drag: 1,
+            alpha: 1,
+          });
+        }
+      }
+
+      emitCountdown(x, y, step) {
+        const count = step === "START" ? 46 : 24;
+        for (let i = 0; i < count; i += 1) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 180 + Math.random() * 360;
+          this.particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 0,
+            maxLife: 540 + Math.random() * 300,
+            size: 10 + Math.random() * 18,
+            rotation: Math.random() * Math.PI,
+            rotationSpeed: -3 + Math.random() * 6,
+            shape: ["star", "circle", "diamond", "heart"][Math.floor(Math.random() * 4)],
+            color: step === "START" ? "#d84f36" : "#d49a2f",
+            gravity: 120,
+            drag: 0.988,
+            alpha: 1,
+          });
+        }
+        this.emitWave(x, y, step === "START" ? "#d84f36" : "#d49a2f", step === "START" ? 2 : 1);
+        this.limit();
+      }
+
+      emitStartBurst() {
+        this.emitCountdown(CONFIG.baseWidth / 2, CONFIG.baseHeight / 2, "START");
+      }
+
+      update(dtMs) {
+        this.particles.forEach((particle) => {
+          particle.life += dtMs;
+          if (particle.life < 0) return;
+          const dt = dtMs / 1000;
+          particle.vx *= Math.pow(particle.drag, dtMs / 16.67);
+          particle.vy = particle.vy * Math.pow(particle.drag, dtMs / 16.67) + particle.gravity * dt;
+          particle.x += particle.vx * dt;
+          particle.y += particle.vy * dt;
+          particle.rotation += particle.rotationSpeed * dt;
+          particle.alpha = 1 - clamp(particle.life / particle.maxLife, 0, 1);
+        });
+        this.particles = this.particles.filter((particle) => particle.life <= particle.maxLife);
+      }
+
+      limit() {
+        const max = CONFIG.settings.particleLimit[this.calibration.settings.particleQuality] || 220;
+        if (this.particles.length > max) {
+          this.particles.splice(0, this.particles.length - max);
+        }
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        this.particles.forEach((particle) => {
+          if (particle.life < 0) return;
+          ctx.save();
+          ctx.translate(particle.x, particle.y);
+          ctx.rotate(particle.rotation);
+          ctx.globalAlpha = particle.alpha;
+          ctx.fillStyle = particle.color;
+          ctx.strokeStyle = particle.color;
+          ctx.lineWidth = 5;
+          this.drawShape(ctx, particle);
+          ctx.restore();
+        });
+        ctx.restore();
+      }
+
+      drawShape(ctx, particle) {
+        const s = particle.size;
+        if (particle.shape === "wave") {
+          ctx.globalAlpha *= 0.45;
+          ctx.lineWidth = 7;
+          ctx.beginPath();
+          ctx.arc(0, 0, s + particle.life * 0.35, 0, Math.PI * 2);
+          ctx.stroke();
+          return;
+        }
+        if (particle.shape === "star") {
+          ctx.beginPath();
+          for (let i = 0; i < 10; i += 1) {
+            const r = i % 2 === 0 ? s : s * 0.42;
+            const a = -Math.PI / 2 + i * Math.PI / 5;
+            ctx[i === 0 ? "moveTo" : "lineTo"](Math.cos(a) * r, Math.sin(a) * r);
+          }
+          ctx.closePath();
+          ctx.fill();
+          return;
+        }
+        if (particle.shape === "heart") {
+          ctx.beginPath();
+          ctx.moveTo(0, s * 0.45);
+          ctx.bezierCurveTo(-s * 1.15, -s * 0.2, -s * 0.65, -s * 1.1, 0, -s * 0.45);
+          ctx.bezierCurveTo(s * 0.65, -s * 1.1, s * 1.15, -s * 0.2, 0, s * 0.45);
+          ctx.fill();
+          return;
+        }
+        if (particle.shape === "diamond") {
+          ctx.beginPath();
+          ctx.moveTo(0, -s);
+          ctx.lineTo(s * 0.8, 0);
+          ctx.lineTo(0, s);
+          ctx.lineTo(-s * 0.8, 0);
+          ctx.closePath();
+          ctx.fill();
+          return;
+        }
+        if (particle.shape === "spark") {
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(-s, 0);
+          ctx.lineTo(s, 0);
+          ctx.moveTo(0, -s * 0.35);
+          ctx.lineTo(0, s * 0.35);
+          ctx.stroke();
+          return;
+        }
+        ctx.beginPath();
+        ctx.arc(0, 0, s * 0.65, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    class Renderer {
+      constructor(canvas, assetLoader, particleSystem, calibration) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d", { alpha: false });
+        this.assetLoader = assetLoader;
+        this.particleSystem = particleSystem;
+        this.calibration = calibration;
+        this.width = CONFIG.baseWidth;
+        this.height = CONFIG.baseHeight;
+        this.dpr = 1;
+        this.metrics = this.createMetrics();
+        this.resize = this.resize.bind(this);
+        window.addEventListener("resize", this.resize);
+        window.addEventListener("orientationchange", this.resize);
+      }
+
+      resize() {
+        const vh = window.visualViewport?.height || window.innerHeight;
+        document.documentElement.style.setProperty("--app-height", `${vh}px`);
+        const frame = document.getElementById("gameFrame");
+        const maxWidth = Math.min(window.innerWidth, 520);
+        const widthByHeight = vh * 9 / 16;
+        const cssWidth = Math.min(maxWidth, widthByHeight);
+        const cssHeight = cssWidth * 16 / 9;
+        frame.style.width = `${cssWidth}px`;
+        frame.style.height = `${Math.min(cssHeight, vh)}px`;
+        this.dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+        this.canvas.width = Math.round(CONFIG.baseWidth * this.dpr);
+        this.canvas.height = Math.round(CONFIG.baseHeight * this.dpr);
+        this.canvas.style.width = "100%";
+        this.canvas.style.height = "100%";
+        this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+        this.metrics = this.createMetrics();
+      }
+
+      createMetrics() {
+        const W = CONFIG.baseWidth;
+        const H = CONFIG.baseHeight;
+        const laneX = {};
+        Object.values(CONFIG.lanes).forEach((lane) => {
+          laneX[lane.id] = W * lane.xRatio;
+        });
+        return {
+          W,
+          H,
+          spawnY: -CONFIG.note.spawnOffsetY,
+          judgementY: H * 0.72,
+          drumY: H * 0.83,
+          drumRadius: W * 0.39,
+          laneX,
+          noteRadius: clamp(W * CONFIG.note.radiusRatio, CONFIG.note.minRadius, CONFIG.note.maxRadius),
+          hitZones: {
+            slap: { x: laneX.slap, y: H * 0.79, r: 82 },
+            bass: { x: laneX.bass, y: H * 0.785, r: 94 },
+            tone: { x: laneX.tone, y: H * 0.79, r: 82 },
+          },
+        };
+      }
+
+      render(game) {
+        const ctx = this.ctx;
+        ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+        ctx.clearRect(0, 0, this.width, this.height);
+        this.drawBackground(ctx, game);
+
+        if (game.stateManager.is(STATE.READY) || game.stateManager.is(STATE.BOOT)) {
+          this.drawReadyCanvas(ctx);
+        }
+
+        if ([STATE.COUNTDOWN, STATE.PLAYING, STATE.PAUSED, STATE.PRACTICE, STATE.RESULT].includes(game.stateManager.state)) {
+          this.drawLanes(ctx, game);
+          this.drawNotes(ctx, game);
+          this.drawDrum(ctx, game);
+          this.drawHitZones(ctx, game);
+          this.particleSystem.draw(ctx);
+          this.drawHud(ctx, game);
+        }
+
+        if (game.stateManager.is(STATE.COUNTDOWN)) this.drawCountdown(ctx, game);
+        if (game.stateManager.is(STATE.PRACTICE)) this.drawPractice(ctx, game);
+        if (DEBUG) this.drawDebug(ctx, game);
+      }
+
+      drawBackground(ctx, game) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, this.height);
+        gradient.addColorStop(0, "#fffdf9");
+        gradient.addColorStop(0.56, "#fff7ec");
+        gradient.addColorStop(1, "#f5e4d6");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, this.width, this.height);
+        const intro = this.assetLoader.getImage("introDrum");
+        if (intro && game.stateManager.is(STATE.READY)) {
+          ctx.save();
+          ctx.globalAlpha = 0.14;
+          this.drawImageContain(ctx, intro, this.width * 0.06, this.height * 0.12, this.width * 0.88, this.height * 0.72);
+          ctx.restore();
+        }
+      }
+
+      drawReadyCanvas(ctx) {
+        ctx.save();
+        ctx.fillStyle = "rgba(216, 79, 54, 0.06)";
+        ctx.beginPath();
+        ctx.arc(this.width * 0.88, this.height * 0.1, 210, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(47, 122, 99, 0.06)";
+        ctx.beginPath();
+        ctx.arc(this.width * 0.08, this.height * 0.9, 260, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      drawLanes(ctx, game) {
+        const m = this.metrics;
+        ctx.save();
+        ctx.globalAlpha = 0.96;
+        Object.values(CONFIG.lanes).forEach((lane) => {
+          const x = m.laneX[lane.id];
+          const active = game.laneEffects[lane.id]?.pulse || 0;
+          const laneGradient = ctx.createLinearGradient(x, 210, x, m.judgementY + 120);
+          laneGradient.addColorStop(0, "rgba(255,255,255,0.02)");
+          laneGradient.addColorStop(1, active > 0 ? `${lane.color}22` : "rgba(255,255,255,0.13)");
+          ctx.fillStyle = laneGradient;
+          ctx.fillRect(x - 118, 190, 236, m.judgementY - 80);
+
+          ctx.strokeStyle = active > 0 ? `${lane.color}88` : "rgba(45, 32, 22, 0.12)";
+          ctx.lineWidth = active > 0 ? 7 : 3;
+          ctx.beginPath();
+          ctx.moveTo(x, 210);
+          ctx.lineTo(x, m.judgementY + 58);
+          ctx.stroke();
+
+          ctx.fillStyle = "rgba(40, 31, 25, 0.68)";
+          ctx.font = "800 30px system-ui, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(lane.label, x, 245);
+        });
+
+        ctx.strokeStyle = "rgba(30, 22, 18, 0.2)";
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(110, m.judgementY);
+        ctx.lineTo(this.width - 110, m.judgementY);
+        ctx.stroke();
+        if (this.calibration.settings.showHitWindows) this.drawHitWindows(ctx);
+        ctx.restore();
+      }
+
+      drawHitWindows(ctx) {
+        const m = this.metrics;
+        const scale = 0.56;
+        const windows = [
+          { ms: CONFIG.judgement.perfectMs, color: "rgba(255,255,255,0.55)" },
+          { ms: CONFIG.judgement.greatMs, color: "rgba(212,154,47,0.28)" },
+          { ms: CONFIG.judgement.goodMs, color: "rgba(216,79,54,0.18)" },
+        ];
+        windows.forEach((win) => {
+          ctx.fillStyle = win.color;
+          ctx.fillRect(95, m.judgementY - win.ms * scale, this.width - 190, win.ms * scale * 2);
+        });
+      }
+
+      drawNotes(ctx, game) {
+        if (!game.currentChart) return;
+        const m = this.metrics;
+        const now = game.getCurrentGameTimeMs();
+        const approach = game.calibration.getApproachTimeMs();
+        const activeNotes = game.noteManager.getActiveNotes(now, approach);
+
+        activeNotes.forEach((note) => {
+          const pos = game.noteManager.getPosition(note, now, m, approach);
+          const lane = CONFIG.lanes[note.lane];
+          const radius = m.noteRadius * lerp(0.72, 1.05, pos.progress);
+          const alpha = note.state === "pending" ? clamp(0.25 + pos.progress * 0.78, 0.25, 1) : 1 - clamp((performance.now() - note.animStartedAt) / 420, 0, 1);
+          const y = note.state === "missAnim" ? pos.y + 24 : pos.y;
+          const scale = note.state === "hitAnim" ? 1 + alpha * 0.35 : 1;
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.translate(pos.x, y);
+          ctx.scale(scale, scale);
+          ctx.shadowColor = `${lane.color}88`;
+          ctx.shadowBlur = 20;
+          ctx.fillStyle = "#fff";
+          ctx.strokeStyle = lane.color;
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.arc(0, 0, radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          const image = this.assetLoader.getImage(note.lane === "bass" ? "noteBass" : note.lane === "tone" ? "noteTone" : "noteSlap");
+          if (image) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(0, 0, radius - 9, 0, Math.PI * 2);
+            ctx.clip();
+            this.drawImageContain(ctx, image, -radius + 10, -radius + 10, radius * 2 - 20, radius * 2 - 20);
+            ctx.restore();
+          } else {
+            ctx.fillStyle = lane.color;
+            ctx.font = "900 42px system-ui, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(lane.symbol, 0, 3);
+          }
+          ctx.restore();
+        });
+      }
+
+      drawDrum(ctx, game) {
+        const m = this.metrics;
+        const shake = game.drumShake || { x: 0, y: 0 };
+        const image = this.assetLoader.getImage("hitMap") || this.assetLoader.getImage("playDrum");
+        ctx.save();
+        ctx.translate(shake.x, shake.y);
+        if (image) {
+          ctx.globalAlpha = 0.96;
+          this.drawImageContain(ctx, image, this.width * 0.13, this.height * 0.68, this.width * 0.74, this.height * 0.28);
+        } else {
+          const grad = ctx.createRadialGradient(this.width / 2, m.drumY, 40, this.width / 2, m.drumY, m.drumRadius);
+          grad.addColorStop(0, "#f7d8ad");
+          grad.addColorStop(0.72, "#b87a4c");
+          grad.addColorStop(1, "#593823");
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.ellipse(this.width / 2, m.drumY, m.drumRadius, m.drumRadius * 0.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "rgba(64, 35, 20, 0.38)";
+          ctx.lineWidth = 10;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      drawHitZones(ctx, game) {
+        const m = this.metrics;
+        Object.values(CONFIG.lanes).forEach((lane) => {
+          const zone = m.hitZones[lane.id];
+          const effect = game.laneEffects[lane.id] || {};
+          const pulse = effect.pulse || 0;
+          const scale = 1 + pulse * 0.16;
+          ctx.save();
+          ctx.translate(zone.x, zone.y);
+          ctx.scale(scale, scale);
+          ctx.shadowColor = lane.color;
+          ctx.shadowBlur = 12 + pulse * 26;
+          ctx.fillStyle = pulse > 0 ? lane.light : "rgba(255, 255, 255, 0.72)";
+          ctx.strokeStyle = lane.color;
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.arc(0, 0, zone.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = "#251c17";
+          ctx.font = "900 26px system-ui, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(lane.label, 0, -6);
+          ctx.font = "800 22px system-ui, sans-serif";
+          ctx.fillStyle = "rgba(37, 28, 23, 0.68)";
+          ctx.fillText(lane.keyLabel, 0, 28);
+          ctx.restore();
+
+          if (effect.ripples) {
+            effect.ripples.forEach((ripple) => {
+              const age = performance.now() - ripple.startedAt;
+              const t = clamp(age / ripple.life, 0, 1);
+              ctx.save();
+              ctx.globalAlpha = 1 - t;
+              ctx.strokeStyle = lane.color;
+              ctx.lineWidth = 5 * (1 - t);
+              ctx.beginPath();
+              ctx.arc(zone.x, zone.y, zone.r + t * ripple.size, 0, Math.PI * 2);
+              ctx.stroke();
+              ctx.restore();
+            });
+          }
+        });
+      }
+
+      drawHud(ctx, game) {
+        if (![STATE.PLAYING, STATE.COUNTDOWN, STATE.PAUSED, STATE.PRACTICE].includes(game.stateManager.state)) return;
+        ctx.save();
+        ctx.fillStyle = "rgba(255,255,255,0.82)";
+        ctx.fillRect(42, 42, this.width - 84, 102);
+        ctx.strokeStyle = "rgba(40,31,25,0.12)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(42, 42, this.width - 84, 102);
+        const accuracy = `${game.scoring.accuracy.toFixed(1)}%`;
+        const items = [
+          ["Score", game.scoring.score.toLocaleString()],
+          ["Combo", `${game.scoring.combo}`],
+          ["Accuracy", accuracy],
+        ];
+        items.forEach(([label, value], index) => {
+          const x = lerp(160, this.width - 160, index / 2);
+          ctx.fillStyle = "rgba(37,28,23,0.58)";
+          ctx.font = "700 21px system-ui, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(label, x, 77);
+          ctx.fillStyle = "#1d1713";
+          ctx.font = "900 34px system-ui, sans-serif";
+          ctx.fillText(value, x, 118);
+        });
+
+        if (game.currentChart && [STATE.PLAYING, STATE.COUNTDOWN, STATE.PAUSED].includes(game.stateManager.state)) {
+          const progress = clamp(game.getCurrentGameTimeMs() / game.currentChart.durationMs, 0, 1);
+          ctx.fillStyle = "rgba(40,31,25,0.12)";
+          ctx.fillRect(70, 158, this.width - 140, 10);
+          ctx.fillStyle = "#d84f36";
+          ctx.fillRect(70, 158, (this.width - 140) * progress, 10);
+          ctx.fillStyle = "rgba(37,28,23,0.62)";
+          ctx.font = "700 22px system-ui, sans-serif";
+          ctx.fillText(game.currentChart.title, this.width / 2, 202);
+        }
+
+        game.floatingTexts.forEach((text) => {
+          const age = performance.now() - text.startedAt;
+          const t = clamp(age / text.life, 0, 1);
+          ctx.globalAlpha = 1 - t;
+          ctx.fillStyle = text.color;
+          ctx.font = `900 ${text.size}px system-ui, sans-serif`;
+          ctx.textAlign = "center";
+          ctx.fillText(text.text, text.x, text.y - t * 70);
+          ctx.globalAlpha = 1;
+        });
+        ctx.restore();
+      }
+
+      drawCountdown(ctx, game) {
+        const step = game.countdownStep;
+        if (!step) return;
+        const age = performance.now() - game.countdownStepStartedAt;
+        const t = clamp(age / 780, 0, 1);
+        const scale = 0.45 + Math.sin(t * Math.PI) * 0.38 + t * 0.65;
+        ctx.save();
+        ctx.globalAlpha = 1 - Math.max(0, t - 0.74) / 0.26;
+        ctx.fillStyle = step === "START" ? "#d84f36" : "#201814";
+        ctx.font = `1000 ${step === "START" ? 118 : 190}px system-ui, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.translate(this.width / 2, this.height * 0.43);
+        ctx.scale(scale, scale);
+        ctx.shadowColor = "rgba(216,79,54,0.32)";
+        ctx.shadowBlur = 36;
+        ctx.fillText(step, 0, 0);
+        ctx.restore();
+      }
+
+      drawPractice(ctx, game) {
+        ctx.save();
+        ctx.fillStyle = "rgba(255,255,255,0.86)";
+        ctx.fillRect(70, 248, this.width - 140, 238);
+        ctx.strokeStyle = "rgba(40,31,25,0.12)";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(70, 248, this.width - 140, 238);
+        ctx.fillStyle = "#1d1713";
+        ctx.font = "900 46px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("자유 연습 모드", this.width / 2, 316);
+        ctx.fillStyle = "rgba(37,28,23,0.68)";
+        ctx.font = "700 28px system-ui, sans-serif";
+        ctx.fillText("Bass는 중앙, Tone은 오른쪽, Slap은 왼쪽", this.width / 2, 372);
+        ctx.fillText("4박 패턴: Bass · Tone · Bass · Slap", this.width / 2, 420);
+        ctx.fillStyle = game.practicePatternIndex > 0 ? "#2f7a63" : "rgba(37,28,23,0.42)";
+        ctx.font = "900 30px system-ui, sans-serif";
+        const pattern = ["BASS", "TONE", "BASS", "SLAP"];
+        pattern.forEach((label, index) => {
+          ctx.fillStyle = index < game.practicePatternIndex ? "#2f7a63" : "rgba(37,28,23,0.42)";
+          ctx.fillText(index < game.practicePatternIndex ? `✓ ${label}` : label, 220 + index * 212, 468);
+        });
+        ctx.restore();
+      }
+
+      drawDebug(ctx, game) {
+        ctx.save();
+        ctx.fillStyle = "rgba(0,0,0,0.64)";
+        ctx.fillRect(22, this.height - 190, 440, 150);
+        ctx.fillStyle = "#fff";
+        ctx.font = "24px monospace";
+        ctx.fillText(`time ${game.getCurrentGameTimeMs().toFixed(1)}ms`, 42, this.height - 145);
+        ctx.fillText(`offset ${game.calibration.getInputOffsetMs()}ms`, 42, this.height - 108);
+        ctx.fillText(`last diff ${game.lastJudgeDiffMs?.toFixed?.(1) ?? "-"}ms`, 42, this.height - 71);
+        ctx.restore();
+      }
+
+      drawImageContain(ctx, image, x, y, w, h) {
+        const scale = Math.min(w / image.naturalWidth, h / image.naturalHeight);
+        const drawW = image.naturalWidth * scale;
+        const drawH = image.naturalHeight * scale;
+        ctx.drawImage(image, x + (w - drawW) / 2, y + (h - drawH) / 2, drawW, drawH);
+      }
+    }
+
+    class InputController {
+      constructor(canvas, game) {
+        this.canvas = canvas;
+        this.game = game;
+        this.lastInputAt = new Map();
+        this.boundKeyDown = this.onKeyDown.bind(this);
+        this.boundPointerDown = this.onPointerDown.bind(this);
+      }
+
+      attach() {
+        window.addEventListener("keydown", this.boundKeyDown, { passive: false });
+        this.canvas.addEventListener("pointerdown", this.boundPointerDown, { passive: false });
+      }
+
+      onKeyDown(event) {
+        const code = event.code;
+        if (["Space", "KeyD", "KeyK", "Enter", "Escape"].includes(code)) {
+          event.preventDefault();
+        }
+        if (code === "Enter") {
+          this.game.handleEnter();
+          return;
+        }
+        if (code === "Escape") {
+          this.game.togglePause();
+          return;
+        }
+        const lane = Object.values(CONFIG.lanes).find((item) => item.key === code);
+        if (lane) this.tryInput(lane.id, "keyboard");
+      }
+
+      onPointerDown(event) {
+        event.preventDefault();
+        this.canvas.setPointerCapture?.(event.pointerId);
+        const point = this.toCanvasPoint(event.clientX, event.clientY);
+        const laneId = this.pickLane(point.x, point.y);
+        if (laneId) this.tryInput(laneId, "pointer");
+      }
+
+      toCanvasPoint(clientX, clientY) {
+        const rect = this.canvas.getBoundingClientRect();
+        return {
+          x: ((clientX - rect.left) / rect.width) * CONFIG.baseWidth,
+          y: ((clientY - rect.top) / rect.height) * CONFIG.baseHeight,
+        };
+      }
+
+      pickLane(x, y) {
+        const zones = this.game.renderer.metrics.hitZones;
+        for (const [laneId, zone] of Object.entries(zones)) {
+          const dx = x - zone.x;
+          const dy = y - zone.y;
+          if (Math.hypot(dx, dy) <= zone.r * 1.25) return laneId;
+        }
+        if (x < CONFIG.baseWidth / 3) return "slap";
+        if (x < CONFIG.baseWidth * 2 / 3) return "bass";
+        return "tone";
+      }
+
+      tryInput(laneId, source) {
+        const now = performance.now();
+        const last = this.lastInputAt.get(laneId) || -Infinity;
+        if (now - last < CONFIG.timing.debounceMs) return;
+        this.lastInputAt.set(laneId, now);
+        this.game.handleInput(laneId, source);
+      }
+    }
+
+    class UIManager {
+      constructor(calibration) {
+        this.calibration = calibration;
+        this.elements = {};
+      }
+
+      init(assetLoader) {
+        const ids = [
+          "loadingScreen", "loadingProgress", "loadingText", "loadingIcon", "readyScreen", "heroDrum", "titleIcon",
+          "cardSlap", "cardBass", "cardTone", "startButton", "practiceButton", "settingsButton", "helpButton",
+          "settingsModal", "settingsClose", "helpModal", "helpClose", "settingsIcon", "helpIcon", "resultScreen",
+          "resultIcon", "resultGrade", "resultGrid", "resultFeedback", "retryButton", "resultPracticeButton",
+          "homeButton", "resultSettingsButton", "pauseOverlay", "resumeButton", "practiceToolbar", "practiceHomeButton",
+          "practiceSettingsButton", "orientationNote", "masterVolume", "sfxVolume", "bgmVolume", "noteSpeed",
+          "inputOffset", "particleQuality", "reducedMotion", "showHitWindows", "masterVolumeLabel", "sfxVolumeLabel",
+          "bgmVolumeLabel", "inputOffsetLabel",
+        ];
+        ids.forEach((id) => { this.elements[id] = document.getElementById(id); });
+        this.applyImageElements(assetLoader);
+        this.syncSettingsControls();
+      }
+
+      applyImageElements(assetLoader) {
+        const setSrc = (id, imageName) => {
+          const image = assetLoader.getImage(imageName);
+          if (image && this.elements[id]) this.elements[id].src = image.src;
+        };
+        ["loadingIcon", "titleIcon", "settingsIcon", "helpIcon", "resultIcon"].forEach((id) => setSrc(id, "icon"));
+        setSrc("heroDrum", "introDrum");
+        setSrc("cardSlap", "noteSlap");
+        setSrc("cardBass", "noteBass");
+        setSrc("cardTone", "noteTone");
+      }
+
+      wire(game) {
+        this.elements.startButton.addEventListener("click", () => game.startGame("tutorial"));
+        this.elements.practiceButton.addEventListener("click", () => game.startPractice());
+        this.elements.settingsButton.addEventListener("click", () => this.openSettings());
+        this.elements.helpButton.addEventListener("click", () => this.openHelp());
+        this.elements.settingsClose.addEventListener("click", () => this.closeSettings());
+        this.elements.helpClose.addEventListener("click", () => this.closeHelp());
+        this.elements.retryButton.addEventListener("click", () => game.restart());
+        this.elements.resultPracticeButton.addEventListener("click", () => game.startPractice());
+        this.elements.homeButton.addEventListener("click", () => game.goHome());
+        this.elements.resultSettingsButton.addEventListener("click", () => this.openSettings());
+        this.elements.resumeButton.addEventListener("click", () => game.resume());
+        this.elements.practiceHomeButton.addEventListener("click", () => game.goHome());
+        this.elements.practiceSettingsButton.addEventListener("click", () => this.openSettings());
+        this.wireSettings(game);
+      }
+
+      wireSettings(game) {
+        const update = () => {
+          const partial = {
+            masterVolume: Number(this.elements.masterVolume.value),
+            sfxVolume: Number(this.elements.sfxVolume.value),
+            bgmVolume: Number(this.elements.bgmVolume.value),
+            noteSpeed: this.elements.noteSpeed.value,
+            inputOffset: Number(this.elements.inputOffset.value),
+            particleQuality: this.elements.particleQuality.value,
+            reducedMotion: this.elements.reducedMotion.checked,
+            showHitWindows: this.elements.showHitWindows.checked,
+          };
+          this.calibration.update(partial);
+          game.audio.applySettings(this.calibration.settings);
+          this.syncSettingsLabels();
+        };
+        [
+          "masterVolume", "sfxVolume", "bgmVolume", "noteSpeed", "inputOffset", "particleQuality",
+          "reducedMotion", "showHitWindows",
+        ].forEach((id) => {
+          this.elements[id].addEventListener("input", update);
+          this.elements[id].addEventListener("change", update);
+        });
+      }
+
+      setState(state) {
+        this.elements.loadingScreen.classList.toggle("active", state === STATE.BOOT);
+        this.elements.readyScreen.classList.toggle("active", state === STATE.READY);
+        this.elements.resultScreen.classList.toggle("active", state === STATE.RESULT);
+        this.elements.pauseOverlay.classList.toggle("active", state === STATE.PAUSED);
+        this.elements.practiceToolbar.classList.toggle("active", state === STATE.PRACTICE);
+      }
+
+      setLoading(progress, text) {
+        this.elements.loadingProgress.style.width = `${Math.round(progress * 100)}%`;
+        this.elements.loadingText.textContent = text || "에셋을 확인하고 있어요.";
+      }
+
+      openSettings() {
+        this.syncSettingsControls();
+        this.elements.settingsModal.classList.add("active");
+      }
+
+      closeSettings() {
+        this.elements.settingsModal.classList.remove("active");
+      }
+
+      openHelp() {
+        this.elements.helpModal.classList.add("active");
+      }
+
+      closeHelp() {
+        this.elements.helpModal.classList.remove("active");
+      }
+
+      syncSettingsControls() {
+        const s = this.calibration.settings;
+        this.elements.masterVolume.value = s.masterVolume;
+        this.elements.sfxVolume.value = s.sfxVolume;
+        this.elements.bgmVolume.value = s.bgmVolume;
+        this.elements.noteSpeed.value = s.noteSpeed;
+        this.elements.inputOffset.value = s.inputOffset;
+        this.elements.particleQuality.value = s.particleQuality;
+        this.elements.reducedMotion.checked = s.reducedMotion;
+        this.elements.showHitWindows.checked = s.showHitWindows;
+        this.syncSettingsLabels();
+      }
+
+      syncSettingsLabels() {
+        const s = this.calibration.settings;
+        this.elements.masterVolumeLabel.textContent = `${Math.round(s.masterVolume * 100)}%`;
+        this.elements.sfxVolumeLabel.textContent = `${Math.round(s.sfxVolume * 100)}%`;
+        this.elements.bgmVolumeLabel.textContent = `${Math.round(s.bgmVolume * 100)}%`;
+        this.elements.inputOffsetLabel.textContent = `${s.inputOffset}ms`;
+      }
+
+      showResult(data) {
+        this.elements.resultGrade.textContent = data.grade;
+        this.elements.resultGrid.innerHTML = [
+          ["최종 점수", data.score.toLocaleString()],
+          ["최고 점수", data.bestScore.toLocaleString()],
+          ["최고 콤보", data.maxCombo],
+          ["정확도", `${data.accuracy.toFixed(1)}%`],
+          ["Perfect / Great", `${data.perfect} / ${data.great}`],
+          ["Good / Miss", `${data.good} / ${data.miss}`],
+          ["Slap 성공률", `${data.laneRates.slap}%`],
+          ["Bass · Tone", `${data.laneRates.bass}% · ${data.laneRates.tone}%`],
+        ].map(([label, value]) => `<div class="result-stat"><span>${label}</span><strong>${value}</strong></div>`).join("");
+        this.elements.resultFeedback.textContent = data.feedback;
+      }
+
+      updateOrientationNote() {
+        const tooWide = window.innerWidth > window.innerHeight && window.innerHeight < 520;
+        this.elements.orientationNote.classList.toggle("active", tooWide);
+      }
+    }
+
+    class Game {
+      constructor() {
+        this.canvas = document.getElementById("gameCanvas");
+        this.calibration = new CalibrationManager();
+        this.assetLoader = new AssetLoader(ASSETS);
+        this.chartManager = new ChartManager(CHARTS);
+        this.scoring = new ScoringSystem();
+        this.noteManager = new NoteManager();
+        this.particleSystem = new ParticleSystem(this.calibration);
+        this.audio = new AudioEngine(ASSETS, this.calibration);
+        this.stateManager = new GameStateManager();
+        this.renderer = new Renderer(this.canvas, this.assetLoader, this.particleSystem, this.calibration);
+        this.input = new InputController(this.canvas, this);
+        this.ui = new UIManager(this.calibration);
+        this.currentChart = null;
+        this.lastFrameAt = performance.now();
+        this.startPerformanceMs = 0;
+        this.startAudioMs = 0;
+        this.pauseStartedAt = 0;
+        this.countdownStartedAt = 0;
+        this.countdownStep = null;
+        this.countdownStepStartedAt = 0;
+        this.lastCountdownStep = null;
+        this.laneEffects = { slap: {}, bass: {}, tone: {} };
+        this.floatingTexts = [];
+        this.drumShake = { x: 0, y: 0 };
+        this.drumShakeUntil = 0;
+        this.activeChartId = "tutorial";
+        this.practicePattern = ["bass", "tone", "bass", "slap"];
+        this.practicePatternIndex = 0;
+        this.lastJudgeDiffMs = null;
+        this.animationFrame = null;
+      }
+
+      async boot() {
+        this.calibration.load();
+        this.renderer.resize();
+        this.input.attach();
+        this.ui.init(this.assetLoader);
+        this.ui.wire(this);
+        this.ui.setState(STATE.BOOT);
+        this.ui.updateOrientationNote();
+        window.addEventListener("resize", () => this.ui.updateOrientationNote());
+
+        await this.assetLoader.loadImages((progress, text) => {
+          this.ui.setLoading(progress, text);
+        });
+        this.ui.applyImageElements(this.assetLoader);
+        this.ui.setLoading(1, "준비 완료");
+        await new Promise((resolve) => setTimeout(resolve, 260));
+        this.stateManager.set(STATE.READY);
+        this.ui.setState(STATE.READY);
+        this.loop(performance.now());
+      }
+
+      async ensureAudio() {
+        await this.audio.init();
+      }
+
+      async startGame(chartId = "tutorial") {
+        this.activeChartId = chartId;
+        await this.ensureAudio();
+        this.currentChart = this.chartManager.getChart(chartId);
+        this.noteManager.load(this.currentChart);
+        this.scoring.reset(this.currentChart.notes.length);
+        this.particleSystem.particles = [];
+        this.floatingTexts = [];
+        this.practicePatternIndex = 0;
+        this.countdownStartedAt = performance.now();
+        this.countdownStep = null;
+        this.lastCountdownStep = null;
+        this.stateManager.set(STATE.COUNTDOWN);
+        this.ui.setState(STATE.COUNTDOWN);
+      }
+
+      beginPlaying() {
+        this.stateManager.set(STATE.PLAYING);
+        this.ui.setState(STATE.PLAYING);
+        this.startPerformanceMs = performance.now();
+        this.startAudioMs = this.audio.getCurrentAudioTimeMs();
+        this.audio.startBgm(this.currentChart);
+        this.particleSystem.emitStartBurst();
+      }
+
+      startPractice() {
+        this.ensureAudio();
+        this.audio.stopBgm();
+        this.currentChart = null;
+        this.noteManager.reset();
+        this.scoring.reset(0);
+        this.practicePatternIndex = 0;
+        this.stateManager.set(STATE.PRACTICE);
+        this.ui.setState(STATE.PRACTICE);
+      }
+
+      restart() {
+        this.startGame(this.activeChartId);
+      }
+
+      goHome() {
+        this.audio.stopBgm();
+        this.currentChart = null;
+        this.noteManager.reset();
+        this.stateManager.set(STATE.READY);
+        this.ui.setState(STATE.READY);
+      }
+
+      handleEnter() {
+        if (this.stateManager.is(STATE.READY)) this.startGame("tutorial");
+        else if (this.stateManager.is(STATE.RESULT)) this.restart();
+        else if (this.stateManager.is(STATE.PAUSED)) this.resume();
+      }
+
+      togglePause() {
+        if (this.stateManager.is(STATE.PLAYING)) this.pause();
+        else if (this.stateManager.is(STATE.PAUSED)) this.resume();
+      }
+
+      pause() {
+        this.pauseStartedAt = performance.now();
+        this.audio.stopBgm();
+        this.stateManager.set(STATE.PAUSED);
+        this.ui.setState(STATE.PAUSED);
+      }
+
+      resume() {
+        if (!this.stateManager.is(STATE.PAUSED)) return;
+        const pauseDuration = performance.now() - this.pauseStartedAt;
+        this.startPerformanceMs += pauseDuration;
+        this.stateManager.set(STATE.PLAYING);
+        this.ui.setState(STATE.PLAYING);
+        this.audio.startBgm(this.currentChart);
+      }
+
+      getCurrentGameTimeMs() {
+        if (!this.currentChart) return 0;
+        if (this.stateManager.is(STATE.PAUSED)) {
+          return this.pauseStartedAt - this.startPerformanceMs;
+        }
+        if (this.stateManager.is(STATE.COUNTDOWN)) return 0;
+        return Math.max(0, performance.now() - this.startPerformanceMs);
+      }
+
+      getJudgementTimeMs() {
+        // 노트 위치는 실제 게임 시간으로, 판정은 사용자가 보정한 offset을 더한 시간으로 계산한다.
+        return this.getCurrentGameTimeMs() + this.calibration.getInputOffsetMs();
+      }
+
+      handleInput(laneId, source) {
+        this.audio.play(laneId, { gain: laneId === "bass" ? 1.04 : 0.95 });
+        this.triggerLaneEffect(laneId, source);
+
+        if (this.stateManager.is(STATE.PRACTICE)) {
+          this.handlePracticeInput(laneId);
+          return;
+        }
+
+        if (!this.stateManager.is(STATE.PLAYING)) return;
+        const judgeTime = this.getJudgementTimeMs();
+        const closest = this.noteManager.findClosest(laneId, judgeTime);
+        if (!closest) {
+          this.addFloatingText("Tap!", CONFIG.lanes[laneId].color, 46, CONFIG.baseWidth / 2, CONFIG.baseHeight * 0.53);
+          return;
+        }
+
+        const judgement = this.scoring.judge(closest.diffMs);
+        this.lastJudgeDiffMs = closest.diffMs;
+        this.noteManager.consume(closest.note, judgement);
+        const gained = this.scoring.record(laneId, judgement);
+        const zone = this.renderer.metrics.hitZones[laneId];
+        this.particleSystem.emitHit(zone.x, zone.y, laneId, judgement);
+        if (judgement === "miss") {
+          this.audio.playMiss();
+          this.addFloatingText("Miss", "#d84f36", 58, zone.x, zone.y - 120);
+        } else {
+          this.audio.playHit(laneId, judgement);
+          this.addFloatingText(`${judgement.toUpperCase()} +${gained}`, CONFIG.lanes[laneId].color, judgement === "perfect" ? 62 : 50, zone.x, zone.y - 130);
+        }
+      }
+
+      handlePracticeInput(laneId) {
+        const expected = this.practicePattern[this.practicePatternIndex];
+        if (laneId === expected) {
+          this.practicePatternIndex += 1;
+          if (this.practicePatternIndex >= this.practicePattern.length) {
+            this.practicePatternIndex = 0;
+            this.addFloatingText("패턴 성공!", "#2f7a63", 58, CONFIG.baseWidth / 2, CONFIG.baseHeight * 0.36);
+            this.particleSystem.emitStartBurst();
+          }
+        } else {
+          this.practicePatternIndex = laneId === this.practicePattern[0] ? 1 : 0;
+        }
+        const zone = this.renderer.metrics.hitZones[laneId];
+        this.particleSystem.emitHit(zone.x, zone.y, laneId, "great");
+        this.addFloatingText(CONFIG.lanes[laneId].label, CONFIG.lanes[laneId].color, 52, zone.x, zone.y - 128);
+      }
+
+      triggerLaneEffect(laneId, source) {
+        const effect = this.laneEffects[laneId];
+        effect.pulse = 1;
+        effect.startedAt = performance.now();
+        effect.ripples = [
+          { startedAt: performance.now(), life: 460, size: laneId === "bass" ? 120 : 82 },
+          { startedAt: performance.now() + 80, life: 520, size: laneId === "tone" ? 112 : 72 },
+        ];
+
+        const shakeMap = {
+          slap: { x: -3, y: -1 },
+          bass: { x: 0, y: 4 },
+          tone: { x: 3, y: -1 },
+        };
+        if (!this.calibration.settings.reducedMotion) {
+          this.drumShake = shakeMap[laneId];
+          this.drumShakeUntil = performance.now() + 90;
+        }
+        if (source === "pointer" && navigator.vibrate) navigator.vibrate(laneId === "bass" ? 18 : 12);
+      }
+
+      addFloatingText(text, color, size, x, y) {
+        this.floatingTexts.push({ text, color, size, x, y, startedAt: performance.now(), life: 760 });
+        if (this.floatingTexts.length > 10) this.floatingTexts.shift();
+      }
+
+      update(dtMs) {
+        this.particleSystem.update(dtMs);
+        this.updateLaneEffects();
+        this.updateCountdown();
+        this.updatePlaying();
+        this.floatingTexts = this.floatingTexts.filter((text) => performance.now() - text.startedAt <= text.life);
+        if (performance.now() > this.drumShakeUntil) this.drumShake = { x: 0, y: 0 };
+      }
+
+      updateLaneEffects() {
+        Object.values(this.laneEffects).forEach((effect) => {
+          if (!effect.startedAt) {
+            effect.pulse = 0;
+            return;
+          }
+          const age = performance.now() - effect.startedAt;
+          effect.pulse = Math.max(0, 1 - age / 180);
+          effect.ripples = (effect.ripples || []).filter((ripple) => performance.now() - ripple.startedAt <= ripple.life);
+        });
+      }
+
+      updateCountdown() {
+        if (!this.stateManager.is(STATE.COUNTDOWN)) return;
+        const elapsed = performance.now() - this.countdownStartedAt;
+        let step = null;
+        if (elapsed < 900) step = "3";
+        else if (elapsed < 1800) step = "2";
+        else if (elapsed < 2700) step = "1";
+        else if (elapsed < CONFIG.timing.countdownMs) step = "START";
+        else {
+          this.beginPlaying();
+          return;
+        }
+
+        if (step !== this.lastCountdownStep) {
+          this.countdownStep = step;
+          this.lastCountdownStep = step;
+          this.countdownStepStartedAt = performance.now();
+          this.particleSystem.emitCountdown(CONFIG.baseWidth / 2, CONFIG.baseHeight * 0.43, step);
+          this.audio.playCountdown(step);
+        }
+      }
+
+      updatePlaying() {
+        if (!this.stateManager.is(STATE.PLAYING) || !this.currentChart) return;
+        const currentTime = this.getCurrentGameTimeMs();
+        const misses = this.noteManager.collectAutoMisses(currentTime);
+        misses.forEach((note) => {
+          this.scoring.record(note.lane, "miss");
+          const pos = this.renderer.metrics.hitZones[note.lane];
+          this.particleSystem.emitHit(pos.x, pos.y, note.lane, "miss");
+          this.addFloatingText("Miss", "#d84f36", 46, pos.x, pos.y - 118);
+        });
+        this.noteManager.pruneAnimations(performance.now());
+        if (currentTime >= this.currentChart.durationMs || (!this.noteManager.hasPendingNotes() && currentTime > this.currentChart.lastNoteMs + CONFIG.timing.resultDelayMs)) {
+          this.finishGame();
+        }
+      }
+
+      finishGame() {
+        this.audio.stopBgm();
+        const data = this.scoring.getResultData();
+        this.ui.showResult(data);
+        this.stateManager.set(STATE.RESULT);
+        this.ui.setState(STATE.RESULT);
+      }
+
+      loop(now) {
+        const dtMs = clamp(now - this.lastFrameAt, 0, 48);
+        this.lastFrameAt = now;
+        this.update(dtMs);
+        this.renderer.render(this);
+        this.animationFrame = requestAnimationFrame((time) => this.loop(time));
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const game = new Game();
+      game.boot().catch((error) => {
+        console.error("[Game] 부팅 중 오류가 발생했습니다.", error);
+      });
+      window.__DJEMBE_GAME__ = game;
+    });
+  </script>
+</body>
+</html>
