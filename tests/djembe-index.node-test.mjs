@@ -136,6 +136,8 @@ test("rhythm selection layout stays readable inside the narrow game frame", asyn
   const html = await readIndex();
 
   assert.match(html, /\.rhythm-select\s*\{[\s\S]*?word-break:\s*keep-all/);
+  assert.match(html, /\.difficulty-tabs\s*\{[\s\S]*?position:\s*sticky[\s\S]*?z-index:\s*5/);
+  assert.match(html, /\.rhythm-layout\s*\{[\s\S]*?margin-top:\s*8px/);
   assert.match(html, /\.rhythm-detail\s*\{[\s\S]*?order:\s*-1[\s\S]*?position:\s*static/);
   assert.match(html, /\.rhythm-card-list\s*\{[\s\S]*?grid-template-columns:\s*1fr/);
   assert.doesNotMatch(

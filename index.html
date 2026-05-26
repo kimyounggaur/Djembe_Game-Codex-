@@ -427,11 +427,17 @@
     }
 
     .difficulty-tabs {
+      position: sticky;
+      top: 0;
+      z-index: 5;
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding: 2px 0 10px;
+      padding: 2px 0 12px;
       margin: 0 -2px;
+      background:
+        linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(255, 253, 249, 0.92) 78%, rgba(255, 253, 249, 0)),
+        #fffdf9;
       scrollbar-width: none;
     }
 
@@ -461,6 +467,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       gap: 12px;
+      margin-top: 8px;
       min-height: 0;
     }
 
