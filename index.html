@@ -2241,6 +2241,7 @@
         this.height = CONFIG.baseHeight;
         this.dpr = 1;
         this.metrics = this.createMetrics();
+        this.transparentImageCache = new Map();
         this.resize = this.resize.bind(this);
         window.addEventListener("resize", this.resize);
         window.addEventListener("orientationchange", this.resize);
@@ -2439,6 +2440,67 @@
         });
       }
 
+      isTransparentBackgroundPixel(data, index) {
+        const r = data[index];
+        const g = data[index + 1];
+        const b = data[index + 2];
+        const a = data[index + 3];
+        return a > 0 && r >= 246 && g >= 246 && b >= 246 && Math.max(r, g, b) - Math.min(r, g, b) <= 8;
+      }
+
+      getEdgeTransparentImage(image, cacheKey) {
+        if (!image) return null;
+        const key = `${cacheKey}:${image.currentSrc || image.src || image.naturalWidth}`;
+        if (this.transparentImageCache.has(key)) return this.transparentImageCache.get(key);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = image.naturalWidth || image.width;
+        canvas.height = image.naturalHeight || image.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0);
+
+        try {
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const { data, width, height } = imageData;
+          const seen = new Uint8Array(width * height);
+          const queue = [];
+          const queueEdgePixel = (x, y) => {
+            if (x < 0 || y < 0 || x >= width || y >= height) return;
+            const pixel = y * width + x;
+            if (seen[pixel]) return;
+            seen[pixel] = 1;
+            if (this.isTransparentBackgroundPixel(data, pixel * 4)) queue.push(pixel);
+          };
+
+          for (let x = 0; x < width; x += 1) {
+            queueEdgePixel(x, 0);
+            queueEdgePixel(x, height - 1);
+          }
+          for (let y = 1; y < height - 1; y += 1) {
+            queueEdgePixel(0, y);
+            queueEdgePixel(width - 1, y);
+          }
+
+          for (let i = 0; i < queue.length; i += 1) {
+            const pixel = queue[i];
+            data[pixel * 4 + 3] = 0;
+            const x = pixel % width;
+            const y = Math.floor(pixel / width);
+            queueEdgePixel(x + 1, y);
+            queueEdgePixel(x - 1, y);
+            queueEdgePixel(x, y + 1);
+            queueEdgePixel(x, y - 1);
+          }
+          ctx.putImageData(imageData, 0, 0);
+        } catch (_) {
+          this.transparentImageCache.set(key, image);
+          return image;
+        }
+
+        this.transparentImageCache.set(key, canvas);
+        return canvas;
+      }
+
       drawDrum(ctx, game) {
         const m = this.metrics;
         const shake = game.drumShake || { x: 0, y: 0 };
@@ -2446,8 +2508,9 @@
         ctx.save();
         ctx.translate(shake.x, shake.y);
         if (image) {
+          const transparentImage = this.getEdgeTransparentImage(image, "playDrum");
           ctx.globalAlpha = 0.96;
-          this.drawImageContain(ctx, image, this.width * 0.13, this.height * 0.68, this.width * 0.74, this.height * 0.28);
+          this.drawImageContain(ctx, transparentImage, this.width * 0.13, this.height * 0.68, this.width * 0.74, this.height * 0.28);
         } else {
           const grad = ctx.createRadialGradient(this.width / 2, m.drumY, 40, this.width / 2, m.drumY, m.drumRadius);
           grad.addColorStop(0, "#f7d8ad");

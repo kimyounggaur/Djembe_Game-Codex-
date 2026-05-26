@@ -156,3 +156,13 @@ test("ready screen content is lifted toward the top of the portrait frame", asyn
   assert.match(html, /#readyScreen\s+\.button-stack\s*\{[\s\S]*?margin-top:\s*clamp\(12px,\s*2vh,\s*18px\)/);
   assert.match(html, /#readyScreen\s+\.hero-drum\s*\{[\s\S]*?bottom:\s*-12%/);
 });
+
+test("play drum image removes only edge-connected white background", async () => {
+  const html = await readIndex();
+
+  assert.match(html, /transparentImageCache\s*=\s*new Map\(\)/);
+  assert.match(html, /getEdgeTransparentImage\s*\(\s*image\s*,\s*cacheKey/);
+  assert.match(html, /isTransparentBackgroundPixel\s*\(/);
+  assert.match(html, /queueEdgePixel\s*\(/);
+  assert.match(html, /this\.drawImageContain\(ctx,\s*transparentImage,\s*this\.width \* 0\.13/);
+});

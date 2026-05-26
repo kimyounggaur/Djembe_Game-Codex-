@@ -149,6 +149,25 @@ const readyState = await evaluate(`({
   })()
 })`);
 
+const transparentDrumState = await evaluate(`(() => {
+  const game = window.__DJEMBE_GAME__;
+  const image = game.assetLoader.getImage('hitMap');
+  const transparentImage = game.renderer.getEdgeTransparentImage(image, 'smoke-hitMap');
+  const canvas = document.createElement('canvas');
+  canvas.width = transparentImage.width;
+  canvas.height = transparentImage.height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(transparentImage, 0, 0);
+  const corner = ctx.getImageData(0, 0, 1, 1).data;
+  const center = ctx.getImageData(Math.floor(canvas.width / 2), Math.floor(canvas.height / 2), 1, 1).data;
+  return {
+    cornerAlpha: corner[3],
+    centerAlpha: center[3],
+    width: canvas.width,
+    height: canvas.height
+  };
+})()`);
+
 const rect = await evaluate(`(() => {
   const r = document.getElementById('startButton').getBoundingClientRect();
   return { x: r.x, y: r.y, width: r.width, height: r.height };
@@ -264,13 +283,16 @@ const practiceResultState = await evaluate(`({
 ws.close();
 cleanup();
 
-console.log(JSON.stringify({ readyState, rhythmState, playState, resultState, practiceResultState, errors }, null, 2));
+console.log(JSON.stringify({ readyState, transparentDrumState, rhythmState, playState, resultState, practiceResultState, errors }, null, 2));
 
 if (!readyState.canvas || !readyState.readyActive || readyState.state !== "ready") {
   throw new Error("Ready screen did not initialize correctly");
 }
 if (readyState.layout.contentTop > Math.round(viewportHeight * 0.16) || readyState.layout.startButtonTop > Math.round(viewportHeight * 0.64)) {
   throw new Error(`Ready screen content is too low: ${JSON.stringify(readyState.layout)}`);
+}
+if (transparentDrumState.cornerAlpha !== 0 || transparentDrumState.centerAlpha === 0) {
+  throw new Error(`Play drum white background was not removed correctly: ${JSON.stringify(transparentDrumState)}`);
 }
 if (!rhythmState.visible || rhythmState.cardCount < 12) {
   throw new Error("Rhythm selection screen did not show the rhythm library");
