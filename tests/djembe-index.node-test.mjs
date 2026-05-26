@@ -72,3 +72,13 @@ test("chart and input safeguards are implemented in the shipped HTML", async () 
   assert.match(html, /localStorage/);
   assert.match(html, /navigator\.vibrate/);
 });
+
+test("gameplay does not auto-start a djembe rhythm backing track", async () => {
+  const html = await readIndex();
+
+  assert.doesNotMatch(
+    html,
+    /this\.audio\.startBgm\(/,
+    "starting or resuming gameplay should not launch the djembe rhythm loop automatically",
+  );
+});

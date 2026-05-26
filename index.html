@@ -2256,7 +2256,6 @@
         this.ui.setState(STATE.PLAYING);
         this.startPerformanceMs = performance.now();
         this.startAudioMs = this.audio.getCurrentAudioTimeMs();
-        this.audio.startBgm(this.currentChart);
         this.particleSystem.emitStartBurst();
       }
 
@@ -2307,7 +2306,6 @@
         this.startPerformanceMs += pauseDuration;
         this.stateManager.set(STATE.PLAYING);
         this.ui.setState(STATE.PLAYING);
-        this.audio.startBgm(this.currentChart);
       }
 
       getCurrentGameTimeMs() {
