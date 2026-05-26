@@ -898,7 +898,13 @@
             finish(false);
           }, imageTimeoutMs);
 
-          image.onload = () => finish(true);
+          image.onload = () => {
+            if (settled) {
+              this.images.set(name, image);
+              return;
+            }
+            finish(true);
+          };
           image.onerror = () => {
             console.warn(`[AssetLoader] 이미지 누락 또는 로딩 실패: ${url}`);
             finish(false);
