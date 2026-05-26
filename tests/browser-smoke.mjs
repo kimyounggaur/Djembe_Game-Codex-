@@ -20,6 +20,7 @@ const chrome = spawn(chromePath, [
   "--disable-gpu",
   "--no-first-run",
   "--no-default-browser-check",
+  "--autoplay-policy=no-user-gesture-required",
   `--remote-debugging-port=${debugPort}`,
   `--user-data-dir=${userDataDir}`,
   "about:blank",
@@ -159,6 +160,32 @@ await send("Input.dispatchMouseEvent", {
   clickCount: 1,
 });
 
+await waitForExpression("window.__DJEMBE_GAME__.stateManager.state === 'rhythmSelect' && document.getElementById('rhythmSelectScreen').classList.contains('active')", 5000);
+const rhythmState = await evaluate(`({
+  state: window.__DJEMBE_GAME__.stateManager.state,
+  visible: document.getElementById('rhythmSelectScreen').classList.contains('active'),
+  cardCount: document.querySelectorAll('[data-rhythm-id]').length,
+  selected: window.__DJEMBE_GAME__.selectedRhythmId
+})`);
+
+const previewRect = await evaluate(`(() => {
+  const el = document.getElementById('previewButton');
+  el.scrollIntoView({ block: 'center', inline: 'center' });
+  const r = el.getBoundingClientRect();
+  return { x: r.x, y: r.y, width: r.width, height: r.height };
+})()`);
+await evaluate("document.getElementById('previewButton').click(); true");
+await evaluate("new Promise((resolve) => setTimeout(resolve, 800))");
+await waitForExpression("window.__DJEMBE_GAME__.rhythmPreviewPlayer.isPlaying()", 15000);
+
+const startSelectedRect = await evaluate(`(() => {
+  const el = document.getElementById('selectedStartButton');
+  el.scrollIntoView({ block: 'center', inline: 'center' });
+  const r = el.getBoundingClientRect();
+  return { x: r.x, y: r.y, width: r.width, height: r.height };
+})()`);
+await evaluate("document.getElementById('selectedStartButton').click(); true");
+await waitForExpression("!window.__DJEMBE_GAME__.rhythmPreviewPlayer.isPlaying()", 3000);
 await waitForExpression("window.__DJEMBE_GAME__.stateManager.state === 'playing'", 12000);
 
 await send("Input.dispatchKeyEvent", { type: "keyDown", key: "d", code: "KeyD", windowsVirtualKeyCode: 68, nativeVirtualKeyCode: 68 });
@@ -182,13 +209,44 @@ const playState = await evaluate(`({
   })()
 })`);
 
+await evaluate("window.__DJEMBE_GAME__.finishGame(); true");
+await waitForExpression("window.__DJEMBE_GAME__.stateManager.state === 'result'", 5000);
+const resultState = await evaluate(`({
+  state: window.__DJEMBE_GAME__.stateManager.state,
+  rhythmInfo: document.getElementById('resultRhythmInfo').textContent,
+  recommendation: document.getElementById('resultRecommendation').textContent,
+  progress: JSON.parse(localStorage.getItem('djembeRhythmGame.progress.v1') || '{}')
+})`);
+
+const selectRect = await evaluate(`(() => {
+  const el = document.getElementById('selectRhythmButton');
+  el.scrollIntoView({ block: 'center', inline: 'center' });
+  const r = el.getBoundingClientRect();
+  return { x: r.x, y: r.y, width: r.width, height: r.height };
+})()`);
+await evaluate("document.getElementById('selectRhythmButton').click(); true");
+await waitForExpression("window.__DJEMBE_GAME__.stateManager.state === 'rhythmSelect'", 5000);
+
+await evaluate("document.getElementById('selectedPracticeButton').click(); true");
+await waitForExpression("window.__DJEMBE_GAME__.stateManager.state === 'playing'", 12000);
+await evaluate("window.__DJEMBE_GAME__.finishGame(); true");
+await waitForExpression("window.__DJEMBE_GAME__.stateManager.state === 'result'", 5000);
+const practiceResultState = await evaluate(`({
+  rhythmInfo: document.getElementById('resultRhythmInfo').textContent,
+  recommendation: document.getElementById('resultRecommendation').textContent,
+  progress: JSON.parse(localStorage.getItem('djembeRhythmGame.progress.v1') || '{}')
+})`);
+
 ws.close();
 cleanup();
 
-console.log(JSON.stringify({ readyState, playState, errors }, null, 2));
+console.log(JSON.stringify({ readyState, rhythmState, playState, resultState, practiceResultState, errors }, null, 2));
 
 if (!readyState.canvas || !readyState.readyActive || readyState.state !== "ready") {
   throw new Error("Ready screen did not initialize correctly");
+}
+if (!rhythmState.visible || rhythmState.cardCount < 12) {
+  throw new Error("Rhythm selection screen did not show the rhythm library");
 }
 if (playState.state !== "playing") {
   throw new Error("Game did not reach playing state after countdown");
@@ -198,6 +256,18 @@ if (!["running", "none"].includes(playState.audioState)) {
 }
 if (playState.canvasPixels[3] === 0) {
   throw new Error("Canvas appears blank at center pixel");
+}
+if (resultState.state !== "result" || !resultState.rhythmInfo.includes("기본 박자")) {
+  throw new Error("Result screen did not include the selected rhythm");
+}
+if (!resultState.progress.records?.intro_basic_pulse) {
+  throw new Error("Normal mode result was not saved to rhythm progress");
+}
+if (!practiceResultState.rhythmInfo.includes("연습 모드")) {
+  throw new Error("Practice result did not show practice mode");
+}
+if (practiceResultState.progress.records?.intro_basic_pulse?.plays !== resultState.progress.records?.intro_basic_pulse?.plays) {
+  throw new Error("Practice mode result should not increment best-record plays");
 }
 if (errors.length) {
   throw new Error(`Browser console/runtime errors detected:\n${errors.join("\n")}`);

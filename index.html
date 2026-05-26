@@ -397,6 +397,240 @@
       font-size: 14px;
     }
 
+    .rhythm-select {
+      justify-content: flex-start;
+      padding: 18px;
+      overflow-y: auto;
+      background:
+        linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(245, 248, 244, 0.96)),
+        #fffdf9;
+    }
+
+    .rhythm-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .rhythm-head h2 {
+      font-size: clamp(28px, 7vw, 42px);
+    }
+
+    .difficulty-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 0 10px;
+      margin: 0 -2px;
+      scrollbar-width: none;
+    }
+
+    .difficulty-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .difficulty-tab {
+      flex: 0 0 auto;
+      min-height: 44px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-weight: 900;
+      color: #322923;
+    }
+
+    .difficulty-tab.active {
+      color: #fff;
+      background: #2f7a63;
+      border-color: #2f7a63;
+      box-shadow: 0 10px 24px rgba(47, 122, 99, 0.18);
+    }
+
+    .rhythm-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .rhythm-card-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .rhythm-card {
+      min-height: 116px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      text-align: left;
+      box-shadow: 0 8px 22px rgba(31, 23, 18, 0.08);
+    }
+
+    .rhythm-card.active {
+      border-color: #2f7a63;
+      box-shadow: 0 0 0 2px rgba(47, 122, 99, 0.15), 0 12px 28px rgba(31, 23, 18, 0.1);
+    }
+
+    .rhythm-card-top,
+    .rhythm-meta,
+    .rhythm-tags,
+    .record-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .rhythm-card-top {
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .rhythm-card strong {
+      font-size: 17px;
+      line-height: 1.15;
+    }
+
+    .difficulty-pill,
+    .tag-pill,
+    .mode-pill,
+    .recommend-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eef6f2;
+      color: #255c4b;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .recommend-pill {
+      background: #fff3d6;
+      color: #7a4a00;
+    }
+
+    .rhythm-meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 6px 0;
+    }
+
+    .rhythm-tags {
+      margin-top: 8px;
+    }
+
+    .tag-pill {
+      background: #f3efe8;
+      color: #5f5148;
+      font-weight: 800;
+    }
+
+    .rhythm-detail {
+      position: sticky;
+      bottom: 0;
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .rhythm-detail h3 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.15;
+    }
+
+    .detail-copy,
+    .record-line,
+    .tip-list {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .tip-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .preview-pattern-wrap {
+      position: relative;
+      height: 96px;
+      border-radius: 8px;
+      border: 1px solid rgba(47, 122, 99, 0.18);
+      background: #f8fbf7;
+      overflow: hidden;
+    }
+
+    #previewPatternCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .preview-cursor {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0%;
+      width: 3px;
+      background: #d84f36;
+      opacity: 0.8;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .detail-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .detail-actions .wide {
+      grid-column: 1 / -1;
+    }
+
+    .result-context,
+    .result-recommendation {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f5faf7;
+      border: 1px solid rgba(47, 122, 99, 0.18);
+      color: #2f3d35;
+      line-height: 1.45;
+      font-size: 13px;
+    }
+
+    @media (min-width: 760px) {
+      .rhythm-layout {
+        grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+        align-items: start;
+      }
+
+      .rhythm-card-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .rhythm-detail {
+        position: sticky;
+        top: 0;
+        bottom: auto;
+      }
+    }
+
     .result-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -489,6 +723,10 @@
       .button-row {
         grid-template-columns: 1fr;
       }
+
+      .detail-actions {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -540,6 +778,46 @@
         </div>
       </div>
       <p class="hint" id="readyHint">D = Slap · Space = Bass · K = Tone<br />모바일에서는 화면 왼쪽/가운데/오른쪽을 터치하세요.</p>
+    </section>
+
+    <section class="screen rhythm-select" id="rhythmSelectScreen" aria-labelledby="rhythmSelectTitle">
+      <div class="rhythm-head">
+        <div>
+          <h2 id="rhythmSelectTitle">리듬 선택</h2>
+          <p class="subtitle">난이도에 맞는 젬베 리듬을 골라보세요</p>
+        </div>
+        <button class="icon-btn" id="rhythmBackButton" type="button" aria-label="시작 화면으로 돌아가기">×</button>
+      </div>
+      <div class="difficulty-tabs" id="difficultyTabs" role="tablist" aria-label="난이도 필터">
+        <button class="difficulty-tab active" type="button" data-difficulty="all">전체</button>
+        <button class="difficulty-tab" type="button" data-difficulty="intro">입문</button>
+        <button class="difficulty-tab" type="button" data-difficulty="beginner">초급</button>
+        <button class="difficulty-tab" type="button" data-difficulty="intermediate">중급</button>
+        <button class="difficulty-tab" type="button" data-difficulty="advanced">고급</button>
+      </div>
+      <div class="rhythm-layout">
+        <div class="rhythm-card-list" id="rhythmCardList" aria-label="리듬 목록"></div>
+        <aside class="rhythm-detail" id="rhythmDetail" aria-live="polite">
+          <div>
+            <span class="difficulty-pill" id="rhythmDetailDifficulty">입문</span>
+            <h3 id="rhythmDetailTitle">기본 박자</h3>
+            <p class="detail-copy" id="rhythmDetailDescription">Bass만으로 박자를 안정적으로 익히는 리듬입니다.</p>
+          </div>
+          <div class="rhythm-meta" id="rhythmDetailMeta"></div>
+          <p class="detail-copy" id="rhythmDetailGoal"></p>
+          <ul class="tip-list" id="rhythmDetailTips"></ul>
+          <div class="record-line" id="rhythmDetailRecord"></div>
+          <div class="preview-pattern-wrap">
+            <canvas id="previewPatternCanvas" width="640" height="160" aria-label="선택 리듬 패턴 미리보기"></canvas>
+            <div class="preview-cursor" id="previewCursor"></div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn-secondary" id="previewButton" type="button">미리듣기</button>
+            <button class="btn-secondary" id="selectedPracticeButton" type="button">연습하기</button>
+            <button class="btn-primary wide" id="selectedStartButton" type="button">이 리듬으로 시작</button>
+          </div>
+        </aside>
+      </div>
     </section>
 
     <section class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
@@ -623,12 +901,16 @@
           </div>
           <strong id="resultGrade">S</strong>
         </div>
+        <div class="result-context" id="resultRhythmInfo"></div>
         <div class="result-grid" id="resultGrid"></div>
+        <div class="result-recommendation" id="resultRecommendation"></div>
         <p class="feedback" id="resultFeedback"></p>
         <div class="button-stack">
-          <button class="btn-primary" id="retryButton" type="button">다시 하기</button>
+          <button class="btn-primary" id="retryButton" type="button">같은 리듬 다시 하기</button>
           <div class="button-row">
             <button class="btn-secondary" id="resultPracticeButton" type="button">연습 모드</button>
+            <button class="btn-secondary" id="selectRhythmButton" type="button">다른 리듬 선택</button>
+            <button class="btn-secondary" id="recommendedRhythmButton" type="button">추천 리듬</button>
             <button class="btn-secondary" id="homeButton" type="button">처음으로</button>
             <button class="btn-secondary" id="resultSettingsButton" type="button">설정</button>
           </div>
@@ -660,6 +942,7 @@
     const STATE = {
       BOOT: "boot",
       READY: "ready",
+      RHYTHM_SELECT: "rhythmSelect",
       COUNTDOWN: "countdown",
       PLAYING: "playing",
       PAUSED: "paused",
@@ -731,6 +1014,90 @@
         resultDelayMs: 900,
       },
     };
+
+    const DIFFICULTY_CONFIG = {
+      intro: {
+        label: "입문",
+        badge: "I",
+        color: "#4caf50",
+        description: "처음 배우는 리듬",
+        defaultApproachTimeMs: 3100,
+        perfectMs: 60,
+        greatMs: 115,
+        goodMs: 170,
+        missMs: 220,
+        minGlobalGapMs: 650,
+        minSameLaneGapMs: 850,
+      },
+      beginner: {
+        label: "초급",
+        badge: "B",
+        color: "#2196f3",
+        description: "기본 그루브 연습",
+        defaultApproachTimeMs: 2800,
+        perfectMs: 55,
+        greatMs: 105,
+        goodMs: 160,
+        missMs: 210,
+        minGlobalGapMs: 500,
+        minSameLaneGapMs: 760,
+      },
+      intermediate: {
+        label: "중급",
+        badge: "M",
+        color: "#ff9800",
+        description: "전환과 악센트 강화",
+        defaultApproachTimeMs: 2500,
+        perfectMs: 50,
+        greatMs: 98,
+        goodMs: 150,
+        missMs: 200,
+        minGlobalGapMs: 430,
+        minSameLaneGapMs: 700,
+      },
+      advanced: {
+        label: "고급",
+        badge: "A",
+        color: "#d84f62",
+        description: "빠른 그루브 도전",
+        defaultApproachTimeMs: 2250,
+        perfectMs: 48,
+        greatMs: 94,
+        goodMs: 145,
+        missMs: 195,
+        minGlobalGapMs: 380,
+        minSameLaneGapMs: 650,
+      },
+    };
+
+    const STORAGE_KEYS = {
+      settings: "djembeRhythmGame.settings.v1",
+      progress: "djembeRhythmGame.progress.v1",
+      lastSelectedRhythm: "djembeRhythmGame.lastSelectedRhythm.v1",
+    };
+
+    const PRACTICE_MODIFIERS = {
+      bpmMultiplier: 0.88,
+      approachTimeMultiplier: 1.18,
+      judgementWindowMultiplier: 1.25,
+      saveBestRecord: false,
+      showGuideText: true,
+    };
+
+    const RHYTHM_LIBRARY_DATA = [
+      { id: "intro_basic_pulse", titleKo: "기본 박자", title: "Basic Pulse", difficulty: "intro", difficultyLabel: "입문", star: 1, bpm: 68, durationMs: 36000, description: "Bass만으로 박자를 안정적으로 익히는 리듬입니다.", learningGoal: "Space 키 Bass를 정확한 타이밍에 누르기", tags: ["Bass 중심", "가장 쉬움", "첫 플레이 추천"], lanesUsed: ["bass"], patternUnit: "quarter", bars: [["bass", "-", "bass", "-"], ["bass", "-", "bass", "-"]], repeat: 8, minGlobalGapMs: 720, minSameLaneGapMs: 900, approachTimeMs: 3200, judgementPreset: "veryEasy", unlock: { type: "always" } },
+      { id: "intro_bass_tone_walk", titleKo: "Bass Tone 걷기", title: "Bass Tone Walk", difficulty: "intro", difficultyLabel: "입문", star: 1, bpm: 72, durationMs: 40000, description: "Bass와 Tone을 번갈아 치며 기본 손 위치를 익힙니다.", learningGoal: "Bass와 Tone의 소리와 위치 차이 익히기", tags: ["Bass", "Tone", "기초"], lanesUsed: ["bass", "tone"], patternUnit: "quarter", bars: [["bass", "tone", "bass", "tone"], ["bass", "tone", "bass", "-"]], repeat: 7, minGlobalGapMs: 650, minSameLaneGapMs: 900, approachTimeMs: 3100, judgementPreset: "veryEasy", unlock: { type: "always" } },
+      { id: "intro_slap_accent", titleKo: "Slap 악센트 입문", title: "Slap Accent Intro", difficulty: "intro", difficultyLabel: "입문", star: 2, bpm: 76, durationMs: 42000, description: "느린 패턴에 Slap을 포인트처럼 넣어봅니다.", learningGoal: "Slap을 급하게 누르지 않고 악센트로 넣기", tags: ["Slap 입문", "느림", "악센트"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "quarter", bars: [["bass", "tone", "bass", "slap"], ["bass", "tone", "bass", "-"]], repeat: 7, minGlobalGapMs: 620, minSameLaneGapMs: 860, approachTimeMs: 3000, judgementPreset: "easy", unlock: { type: "always" } },
+      { id: "beginner_kuku_style", titleKo: "쿠쿠 스타일 기초", title: "Kuku Style Basic", difficulty: "beginner", difficultyLabel: "초급", star: 2, bpm: 84, durationMs: 50000, description: "밝은 느낌의 반복 패턴으로 Bass와 Tone의 안정감을 키웁니다.", learningGoal: "반복 그루브를 유지하면서 Slap 포인트 넣기", tags: ["반복", "밝은 느낌", "초급 추천"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "eighth", bars: [["bass", "-", "tone", "-", "bass", "-", "slap", "-"], ["bass", "-", "tone", "-", "bass", "-", "tone", "-"]], repeat: 8, minGlobalGapMs: 500, minSameLaneGapMs: 760, approachTimeMs: 2800, judgementPreset: "easy", unlock: { type: "always" } },
+      { id: "beginner_fanga_style", titleKo: "팡가 스타일 기초", title: "Fanga Style Basic", difficulty: "beginner", difficultyLabel: "초급", star: 2, bpm: 86, durationMs: 52000, description: "Bass를 중심에 두고 Tone과 Slap을 균형 있게 섞는 패턴입니다.", learningGoal: "강박 Bass와 약박 Tone의 균형 잡기", tags: ["균형", "Bass 중심", "초급"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "eighth", bars: [["bass", "-", "tone", "-", "bass", "-", "tone", "-"], ["bass", "-", "slap", "-", "tone", "-", "bass", "-"]], repeat: 8, minGlobalGapMs: 500, minSameLaneGapMs: 760, approachTimeMs: 2750, judgementPreset: "easy", unlock: { type: "always" } },
+      { id: "beginner_call_response", titleKo: "콜 앤 리스폰스", title: "Call & Response", difficulty: "beginner", difficultyLabel: "초급", star: 3, bpm: 88, durationMs: 54000, description: "Bass의 질문과 Tone/Slap의 응답처럼 들리는 쉬운 패턴입니다.", learningGoal: "반복되는 리듬 문장을 기억하고 응답 타이밍 맞추기", tags: ["문답", "기억", "리듬감"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "eighth", bars: [["bass", "-", "-", "tone", "bass", "-", "-", "slap"], ["bass", "-", "tone", "-", "bass", "-", "slap", "-"]], repeat: 8, minGlobalGapMs: 480, minSameLaneGapMs: 740, approachTimeMs: 2700, judgementPreset: "easy", unlock: { type: "always" } },
+      { id: "intermediate_djole_style", titleKo: "졸레 스타일 그루브", title: "Djole Style Groove", difficulty: "intermediate", difficultyLabel: "중급", star: 3, bpm: 96, durationMs: 60000, description: "Slap 악센트가 조금 더 자주 등장하는 중급 패턴입니다.", learningGoal: "Slap을 놓치지 않고 그루브 유지하기", tags: ["Slap 강화", "중급", "악센트"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "eighth", bars: [["bass", "-", "tone", "slap", "bass", "-", "tone", "-"], ["bass", "-", "slap", "-", "tone", "-", "bass", "-"]], repeat: 9, minGlobalGapMs: 440, minSameLaneGapMs: 720, approachTimeMs: 2550, judgementPreset: "normal", unlock: { type: "score", rhythmId: "beginner_kuku_style", minAccuracy: 70 } },
+      { id: "intermediate_soli_style", titleKo: "솔리 스타일 러닝", title: "Soli Style Run", difficulty: "intermediate", difficultyLabel: "중급", star: 4, bpm: 100, durationMs: 62000, description: "Tone과 Slap의 전환이 빨라지는 리듬입니다.", learningGoal: "Tone과 Slap 사이의 손 위치 전환 속도 높이기", tags: ["전환", "중급", "리듬감"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "eighth", bars: [["bass", "-", "tone", "-", "slap", "-", "tone", "-"], ["bass", "tone", "-", "slap", "bass", "-", "tone", "-"]], repeat: 9, minGlobalGapMs: 430, minSameLaneGapMs: 700, approachTimeMs: 2450, judgementPreset: "normal", unlock: { type: "score", rhythmId: "beginner_call_response", minAccuracy: 72 } },
+      { id: "intermediate_kassa_style", titleKo: "카사 스타일 밸런스", title: "Kassa Style Balance", difficulty: "intermediate", difficultyLabel: "중급", star: 4, bpm: 102, durationMs: 64000, description: "세 타법을 고르게 사용하는 균형형 중급 패턴입니다.", learningGoal: "Bass, Tone, Slap 성공률을 고르게 끌어올리기", tags: ["균형", "세 타법", "중급"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "eighth", bars: [["bass", "-", "tone", "-", "slap", "-", "bass", "-"], ["tone", "-", "bass", "-", "slap", "-", "tone", "-"]], repeat: 9, minGlobalGapMs: 430, minSameLaneGapMs: 700, approachTimeMs: 2400, judgementPreset: "normal", unlock: { type: "score", rhythmId: "beginner_fanga_style", minAccuracy: 72 } },
+      { id: "advanced_festival_groove", titleKo: "페스티벌 그루브", title: "Festival Groove", difficulty: "advanced", difficultyLabel: "고급", star: 4, bpm: 108, durationMs: 70000, description: "더 빠른 BPM에서 Slap 악센트와 Tone 전환을 연습합니다.", learningGoal: "빠른 BPM에서도 콤보 유지하기", tags: ["빠름", "고급", "콤보 도전"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "eighth", bars: [["bass", "tone", "-", "slap", "bass", "-", "tone", "-"], ["bass", "-", "slap", "-", "tone", "bass", "-", "slap"]], repeat: 10, minGlobalGapMs: 400, minSameLaneGapMs: 680, approachTimeMs: 2300, judgementPreset: "normal", unlock: { type: "score", rhythmId: "intermediate_kassa_style", minAccuracy: 78 } },
+      { id: "advanced_slap_master", titleKo: "Slap 마스터", title: "Slap Master", difficulty: "advanced", difficultyLabel: "고급", star: 5, bpm: 112, durationMs: 72000, description: "Slap 악센트를 정확히 맞추는 고급 도전 리듬입니다.", learningGoal: "Slap 타이밍 정확도 높이기", tags: ["Slap 집중", "고급", "정확도"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "eighth", bars: [["bass", "-", "slap", "-", "tone", "-", "slap", "-"], ["bass", "tone", "-", "slap", "bass", "-", "tone", "-"]], repeat: 10, minGlobalGapMs: 390, minSameLaneGapMs: 660, approachTimeMs: 2250, judgementPreset: "hardFriendly", unlock: { type: "score", rhythmId: "advanced_festival_groove", minAccuracy: 80 } },
+      { id: "advanced_grand_djembe", titleKo: "그랜드 젬베", title: "Grand Djembe", difficulty: "advanced", difficultyLabel: "고급", star: 5, bpm: 116, durationMs: 75000, description: "현재 버전의 최종 도전 리듬입니다. 빠르지만 노트 겹침은 절대 없어야 합니다.", learningGoal: "빠른 템포에서 세 타법을 모두 안정적으로 연주하기", tags: ["최종 도전", "고급", "세 타법"], lanesUsed: ["bass", "tone", "slap"], patternUnit: "eighth", bars: [["bass", "tone", "-", "slap", "bass", "-", "tone", "slap"], ["bass", "-", "tone", "-", "slap", "-", "bass", "tone"]], repeat: 10, minGlobalGapMs: 380, minSameLaneGapMs: 650, approachTimeMs: 2200, judgementPreset: "hardFriendly", unlock: { type: "score", rhythmId: "advanced_slap_master", minAccuracy: 82 } },
+    ];
 
     const CHARTS = {
       tutorial: {
@@ -805,6 +1172,53 @@
       return beat * (60000 / bpm);
     }
 
+    function safeLocalStorageGet(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (error) {
+        console.warn("[Storage] 불러오기를 건너뜁니다.", key, error);
+        return fallback;
+      }
+    }
+
+    function safeLocalStorageSet(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+      } catch (error) {
+        console.warn("[Storage] 저장을 건너뜁니다.", key, error);
+        return false;
+      }
+    }
+
+    function normalizeLaneToken(token) {
+      const value = String(token || "-").toLowerCase();
+      if (value === "b" || value === "bass") return "bass";
+      if (value === "t" || value === "tone") return "tone";
+      if (value === "s" || value === "slap") return "slap";
+      return null;
+    }
+
+    function getUnitBeat(unit) {
+      return { quarter: 1, eighth: 0.5, sixteenth: 0.25 }[unit] || 0.5;
+    }
+
+    function getDifficultyConfig(difficulty) {
+      return DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.intro;
+    }
+
+    function getJudgementForRhythm(rhythm, mode = "normal") {
+      const config = getDifficultyConfig(rhythm?.difficulty);
+      const multiplier = mode === "practice" ? PRACTICE_MODIFIERS.judgementWindowMultiplier : 1;
+      return {
+        perfectMs: Math.round(config.perfectMs * multiplier),
+        greatMs: Math.round(config.greatMs * multiplier),
+        goodMs: Math.round(config.goodMs * multiplier),
+        missMs: Math.round(config.missMs * multiplier),
+      };
+    }
+
     function validateLaneIds(chart) {
       const valid = new Set(Object.keys(CONFIG.lanes));
       const invalid = chart.notes.filter((note) => !valid.has(note.lane));
@@ -830,8 +1244,8 @@
     }
 
     function validateChartSpacing(chart) {
-      const minGlobal = CONFIG.note.minGlobalGapMs;
-      const minSame = CONFIG.note.minSameLaneGapMs;
+      const minGlobal = chart.minGlobalGapMs || CONFIG.note.minGlobalGapMs;
+      const minSame = chart.minSameLaneGapMs || CONFIG.note.minSameLaneGapMs;
       const lastLaneTime = new Map();
       let lastAnyTime = -Infinity;
       let changed = false;
@@ -1096,9 +1510,18 @@
         this.previousState = null;
       }
 
-      set(nextState) {
+      changeState(nextState, payload = {}) {
         this.previousState = this.state;
         this.state = nextState;
+        this.payload = payload;
+      }
+
+      set(nextState, payload = {}) {
+        this.changeState(nextState, payload);
+      }
+
+      getState() {
+        return this.state;
       }
 
       is(state) {
@@ -1106,9 +1529,135 @@
       }
     }
 
+    class RhythmLibrary {
+      constructor(rhythms = RHYTHM_LIBRARY_DATA) {
+        this.rhythms = rhythms.map((rhythm) => ({ ...rhythm, difficultyLabel: rhythm.difficultyLabel || getDifficultyConfig(rhythm.difficulty).label }));
+        this.byId = new Map(this.rhythms.map((rhythm) => [rhythm.id, rhythm]));
+        this.validateRhythmData();
+      }
+
+      getAllRhythms() {
+        return this.rhythms;
+      }
+
+      getRhythmById(id) {
+        return this.byId.get(id) || this.byId.get("intro_basic_pulse") || this.rhythms[0];
+      }
+
+      getRhythmsByDifficulty(difficulty) {
+        if (!difficulty || difficulty === "all") return this.getAllRhythms();
+        return this.rhythms.filter((rhythm) => rhythm.difficulty === difficulty);
+      }
+
+      getRecommendedNextRhythm(currentRhythmId, result, progressManager) {
+        const current = this.getRhythmById(currentRhythmId);
+        if (!current) return this.rhythms[0];
+        if (!result || result.accuracy < 65) return current;
+
+        const order = ["intro", "beginner", "intermediate", "advanced"];
+        const sameDifficulty = this.rhythms.find((rhythm) => {
+          if (rhythm.id === current.id || rhythm.difficulty !== current.difficulty) return false;
+          const record = progressManager?.getBestRecord(rhythm.id);
+          return !record || record.bestAccuracy < 82;
+        });
+        if (result.accuracy < 82) return sameDifficulty || current;
+
+        const nextDifficulty = order[order.indexOf(current.difficulty) + 1];
+        return this.rhythms.find((rhythm) => rhythm.difficulty === nextDifficulty) || sameDifficulty || current;
+      }
+
+      getRecommendationText(result) {
+        if (!result || result.accuracy < 65) return "같은 리듬을 연습 모드로 한 번 더 해보세요.";
+        if (result.accuracy < 82) return "기본은 잡혔어요. 같은 난이도의 다른 리듬을 추천해요.";
+        if (result.accuracy < 95) return "좋아요. 다음 리듬으로 그루브를 확장해봐요.";
+        return "완벽해요! 다음 난이도에 도전해볼까요?";
+      }
+
+      validateRhythmData() {
+        const ids = new Set();
+        this.rhythms.forEach((rhythm) => {
+          if (!rhythm.id || ids.has(rhythm.id)) throw new Error(`Invalid rhythm id: ${rhythm.id}`);
+          ids.add(rhythm.id);
+          if (!DIFFICULTY_CONFIG[rhythm.difficulty]) throw new Error(`Invalid difficulty: ${rhythm.id}`);
+          if (!Array.isArray(rhythm.bars) || !rhythm.bars.length) throw new Error(`Rhythm needs bars: ${rhythm.id}`);
+          rhythm.bars.flat().forEach((token) => {
+            if (token !== "-" && token !== null && !normalizeLaneToken(token)) throw new Error(`Invalid lane token in ${rhythm.id}: ${token}`);
+          });
+        });
+        return true;
+      }
+    }
+
+    class ProgressManager {
+      constructor(storageKeyPrefix = STORAGE_KEYS.progress) {
+        this.storageKey = storageKeyPrefix;
+        this.data = { lastSelectedRhythmId: "intro_basic_pulse", records: {} };
+      }
+
+      load() {
+        this.data = { ...this.data, ...safeLocalStorageGet(this.storageKey, {}) };
+        this.data.records = this.data.records || {};
+      }
+
+      save() {
+        safeLocalStorageSet(this.storageKey, this.data);
+      }
+
+      getBestRecord(rhythmId) {
+        return this.data.records[rhythmId] || null;
+      }
+
+      updateBestRecord(rhythmId, result, mode = "normal") {
+        if (mode === "practice") return { saved: false, reason: "practice" };
+        const prev = this.getBestRecord(rhythmId) || {};
+        const next = {
+          plays: (prev.plays || 0) + 1,
+          bestScore: Math.max(prev.bestScore || 0, result.score || 0),
+          bestCombo: Math.max(prev.bestCombo || 0, result.maxCombo || 0),
+          bestAccuracy: Math.max(prev.bestAccuracy || 0, result.accuracy || 0),
+          bestGrade: this.getBetterGrade(prev.bestGrade, result.grade),
+          lastPlayedAt: new Date().toISOString(),
+          laneStats: result.laneStats || {},
+        };
+        this.data.records[rhythmId] = next;
+        this.save();
+        return {
+          saved: true,
+          record: next,
+          isNewBestScore: (result.score || 0) > (prev.bestScore || 0),
+          isNewBestAccuracy: (result.accuracy || 0) > (prev.bestAccuracy || 0),
+          isNewBestCombo: (result.maxCombo || 0) > (prev.bestCombo || 0),
+        };
+      }
+
+      getBetterGrade(previous, current) {
+        const order = ["D", "C", "B", "A", "S"];
+        return order.indexOf(current) > order.indexOf(previous || "D") ? current : (previous || current || "D");
+      }
+
+      getLastSelectedRhythmId() {
+        return this.data.lastSelectedRhythmId || safeLocalStorageGet(STORAGE_KEYS.lastSelectedRhythm, "intro_basic_pulse");
+      }
+
+      setLastSelectedRhythmId(rhythmId) {
+        this.data.lastSelectedRhythmId = rhythmId;
+        safeLocalStorageSet(STORAGE_KEYS.lastSelectedRhythm, rhythmId);
+        this.save();
+      }
+
+      getUnlockedRhythmIds() {
+        return Object.keys(this.data.records || {});
+      }
+
+      markRhythmPlayed(rhythmId) {
+        if (!this.data.records[rhythmId]) this.data.records[rhythmId] = { plays: 0, bestScore: 0, bestCombo: 0, bestAccuracy: 0, bestGrade: "D" };
+        this.save();
+      }
+    }
+
     class CalibrationManager {
       constructor() {
-        this.storageKey = "djembe-rhythm-settings-v1";
+        this.storageKey = STORAGE_KEYS.settings;
         this.settings = {
           masterVolume: 0.9,
           sfxVolume: 0.95,
@@ -1122,16 +1671,13 @@
       }
 
       load() {
-        try {
-          const saved = JSON.parse(localStorage.getItem(this.storageKey) || "{}");
-          this.settings = { ...this.settings, ...saved };
-        } catch (error) {
-          console.warn("[CalibrationManager] 설정을 불러오지 못해 기본값을 사용합니다.", error);
-        }
+        const legacy = safeLocalStorageGet("djembe-rhythm-settings-v1", {});
+        const saved = safeLocalStorageGet(this.storageKey, legacy);
+        this.settings = { ...this.settings, ...saved };
       }
 
       save() {
-        localStorage.setItem(this.storageKey, JSON.stringify(this.settings));
+        safeLocalStorageSet(this.storageKey, this.settings);
       }
 
       update(partial) {
@@ -1149,13 +1695,85 @@
     }
 
     class ChartManager {
-      constructor(charts) {
+      constructor(charts, rhythmLibrary = null) {
         this.charts = charts;
+        this.rhythmLibrary = rhythmLibrary;
         Object.values(this.charts).forEach((chart) => validateChartSpacing(chart));
       }
 
       getChart(id = "tutorial") {
         const source = this.charts[id] || this.charts.tutorial;
+        return this.prepareChart(source);
+      }
+
+      loadChartByRhythmId(rhythmId, options = {}) {
+        const rhythm = this.rhythmLibrary?.getRhythmById(rhythmId);
+        if (!rhythm) return this.getChart("tutorial");
+        return this.convertRhythmToChart(rhythm, options);
+      }
+
+      convertRhythmToChart(rhythm, options = {}) {
+        const mode = options.mode || "normal";
+        const difficulty = getDifficultyConfig(rhythm.difficulty);
+        const bpm = Math.round(rhythm.bpm * (mode === "practice" ? PRACTICE_MODIFIERS.bpmMultiplier : 1));
+        const approachTimeMs = Math.round((rhythm.approachTimeMs || difficulty.defaultApproachTimeMs) * (mode === "practice" ? PRACTICE_MODIFIERS.approachTimeMultiplier : 1));
+        const notes = this.generateNotesFromPattern(rhythm);
+        const lastBeat = notes.length ? Math.max(...notes.map((note) => note.beat)) : 0;
+        const chart = {
+          id: rhythm.id,
+          rhythmId: rhythm.id,
+          title: rhythm.titleKo || rhythm.title,
+          bpm,
+          durationMs: Math.max(Math.round((rhythm.durationMs || 40000) / (mode === "practice" ? PRACTICE_MODIFIERS.bpmMultiplier : 1)), Math.round(beatToMs(lastBeat, bpm) + 2400)),
+          notes,
+          difficulty: rhythm.difficulty,
+          difficultyLabel: rhythm.difficultyLabel,
+          approachTimeMs,
+          minGlobalGapMs: rhythm.minGlobalGapMs || difficulty.minGlobalGapMs,
+          minSameLaneGapMs: rhythm.minSameLaneGapMs || difficulty.minSameLaneGapMs,
+          judgement: getJudgementForRhythm(rhythm, mode),
+        };
+        validateChartSpacing(chart);
+        return this.prepareChart(chart);
+      }
+
+      generateNotesFromPattern(rhythm) {
+        const unitBeat = getUnitBeat(rhythm.patternUnit);
+        const bars = rhythm.bars || [];
+        const barLength = Math.max(...bars.map((bar) => bar.length));
+        const notes = [];
+        for (let repeat = 0; repeat < (rhythm.repeat || 1); repeat += 1) {
+          bars.forEach((bar, barIndex) => {
+            bar.forEach((token, stepIndex) => {
+              const lane = normalizeLaneToken(token);
+              if (!lane) return;
+              notes.push({
+                beat: 4 + ((repeat * bars.length + barIndex) * barLength + stepIndex) * unitBeat,
+                lane,
+              });
+            });
+          });
+        }
+        return notes;
+      }
+
+      beatToMs(beat, bpm) {
+        return beatToMs(beat, bpm);
+      }
+
+      validateChartSpacing(chart) {
+        return validateChartSpacing(chart);
+      }
+
+      validateNoOverlappingNotes(chart) {
+        return validateNoOverlappingNotes(chart);
+      }
+
+      validateLaneIds(chart) {
+        return validateLaneIds(chart);
+      }
+
+      prepareChart(source) {
         const prepared = {
           ...source,
           notes: source.notes.map((note, index) => ({
@@ -1190,10 +1808,10 @@
         this.notes = [];
       }
 
-      getActiveNotes(currentTimeMs, approachTimeMs) {
+      getActiveNotes(currentTimeMs, approachTimeMs, missMs = CONFIG.judgement.missMs) {
         return this.notes.filter((note) => {
           if (note.state !== "pending") return note.state === "hitAnim" || note.state === "missAnim";
-          return note.hitTimeMs >= currentTimeMs - CONFIG.judgement.missMs - 220
+          return note.hitTimeMs >= currentTimeMs - missMs - 220
             && note.hitTimeMs <= currentTimeMs + approachTimeMs + 160;
         });
       }
@@ -1204,13 +1822,13 @@
         return { x: metrics.laneX[note.lane], y, progress: clamp(progress, 0, 1.25) };
       }
 
-      findClosest(laneId, currentTimeMs) {
+      findClosest(laneId, currentTimeMs, missMs = CONFIG.judgement.missMs) {
         let closest = null;
         let smallestDiff = Infinity;
         this.notes.forEach((note) => {
           if (note.lane !== laneId || note.state !== "pending") return;
           const diff = Math.abs(note.hitTimeMs - currentTimeMs);
-          if (diff < smallestDiff && diff <= CONFIG.judgement.missMs) {
+          if (diff < smallestDiff && diff <= missMs) {
             closest = note;
             smallestDiff = diff;
           }
@@ -1224,10 +1842,10 @@
         note.animStartedAt = performance.now();
       }
 
-      collectAutoMisses(currentTimeMs) {
+      collectAutoMisses(currentTimeMs, missMs = CONFIG.judgement.missMs) {
         const missed = [];
         this.notes.forEach((note) => {
-          if (note.state === "pending" && currentTimeMs > note.hitTimeMs + CONFIG.judgement.missMs) {
+          if (note.state === "pending" && currentTimeMs > note.hitTimeMs + missMs) {
             note.state = "missAnim";
             note.judgement = "miss";
             note.animStartedAt = performance.now();
@@ -1254,7 +1872,7 @@
         this.reset(0);
       }
 
-      reset(totalNotes = 0) {
+      reset(totalNotes = 0, judgement = CONFIG.judgement) {
         this.score = 0;
         this.combo = 0;
         this.maxCombo = 0;
@@ -1263,6 +1881,7 @@
         this.goodCount = 0;
         this.missCount = 0;
         this.totalNotes = totalNotes;
+        this.judgement = judgement;
         this.hitNotes = 0;
         this.weightedHitScore = 0;
         this.laneStats = {
@@ -1273,9 +1892,9 @@
       }
 
       judge(diffMs) {
-        if (diffMs <= CONFIG.judgement.perfectMs) return "perfect";
-        if (diffMs <= CONFIG.judgement.greatMs) return "great";
-        if (diffMs <= CONFIG.judgement.goodMs) return "good";
+        if (diffMs <= this.judgement.perfectMs) return "perfect";
+        if (diffMs <= this.judgement.greatMs) return "great";
+        if (diffMs <= this.judgement.goodMs) return "good";
         return "miss";
       }
 
@@ -1346,11 +1965,15 @@
         return `${gradeText} 다음에는 ${weak} 타이밍을 조금 더 연습해보세요.`;
       }
 
-      getResultData() {
-        const bestScore = Math.max(Number(localStorage.getItem("djembe-best-score") || 0), this.score);
-        const bestCombo = Math.max(Number(localStorage.getItem("djembe-best-combo") || 0), this.maxCombo);
-        localStorage.setItem("djembe-best-score", String(bestScore));
-        localStorage.setItem("djembe-best-combo", String(bestCombo));
+      getResultData(saveLegacyBest = true) {
+        const previousScore = Number(localStorage.getItem("djembe-best-score") || 0);
+        const previousCombo = Number(localStorage.getItem("djembe-best-combo") || 0);
+        const bestScore = saveLegacyBest ? Math.max(previousScore, this.score) : previousScore;
+        const bestCombo = saveLegacyBest ? Math.max(previousCombo, this.maxCombo) : previousCombo;
+        if (saveLegacyBest) {
+          localStorage.setItem("djembe-best-score", String(bestScore));
+          localStorage.setItem("djembe-best-combo", String(bestCombo));
+        }
         return {
           score: this.score,
           bestScore,
@@ -1363,6 +1986,7 @@
           accuracy: this.accuracy,
           grade: this.getGrade(),
           weakLane: this.getWeakLane(),
+          laneStats: this.laneStats,
           laneRates: {
             slap: this.getLaneRate("slap"),
             bass: this.getLaneRate("bass"),
@@ -1732,8 +2356,8 @@
         if (!game.currentChart) return;
         const m = this.metrics;
         const now = game.getCurrentGameTimeMs();
-        const approach = game.calibration.getApproachTimeMs();
-        const activeNotes = game.noteManager.getActiveNotes(now, approach);
+        const approach = game.getApproachTimeMs();
+        const activeNotes = game.noteManager.getActiveNotes(now, approach, game.getJudgement().missMs);
 
         activeNotes.forEach((note) => {
           const pos = game.noteManager.getPosition(note, now, m, approach);
@@ -1979,6 +2603,12 @@
         if (["Space", "KeyD", "KeyK", "Enter", "Escape"].includes(code)) {
           event.preventDefault();
         }
+        const active = document.activeElement;
+        const isMenuState = [STATE.READY, STATE.RHYTHM_SELECT, STATE.RESULT].includes(this.game.stateManager.state);
+        if (isMenuState && (code === "Space" || code === "Enter") && active && active !== document.body && typeof active.click === "function") {
+          active.click();
+          return;
+        }
         if (code === "Enter") {
           this.game.handleEnter();
           return;
@@ -1987,6 +2617,7 @@
           this.game.togglePause();
           return;
         }
+        if (![STATE.PLAYING, STATE.PRACTICE].includes(this.game.stateManager.state)) return;
         const lane = Object.values(CONFIG.lanes).find((item) => item.key === code);
         if (lane) this.tryInput(lane.id, "keyboard");
       }
@@ -2028,6 +2659,268 @@
       }
     }
 
+    class RhythmPreviewPlayer {
+      constructor(audioEngine, rhythmLibrary, ui = null) {
+        this.audioEngine = audioEngine;
+        this.rhythmLibrary = rhythmLibrary;
+        this.ui = ui;
+        this.timerIds = [];
+        this.playing = false;
+        this.rhythmId = null;
+        this.previewStartMs = 0;
+        this.previewDurationMs = 0;
+        this.animationFrame = null;
+        this.playToken = 0;
+      }
+
+      async playPreview(rhythmId) {
+        if (this.playing && this.rhythmId === rhythmId) {
+          this.stopPreview();
+          return false;
+        }
+        this.stopPreview();
+        const token = ++this.playToken;
+        const rhythm = this.rhythmLibrary.getRhythmById(rhythmId);
+        if (!rhythm) return false;
+        await this.audioEngine.init();
+        if (token !== this.playToken) return false;
+        const notes = this.getPreviewNotes(rhythm);
+        const beatMs = 60000 / rhythm.bpm;
+        this.playing = true;
+        this.rhythmId = rhythmId;
+        this.previewStartMs = performance.now();
+        this.previewDurationMs = Math.max(...notes.map((note) => note.delayMs), beatMs * 4) + beatMs;
+        notes.forEach((note) => {
+          const id = setTimeout(() => {
+            if (!this.playing) return;
+            this.audioEngine.play(note.lane, { gain: note.lane === "bass" ? 0.9 : 0.78 });
+            this.ui?.flashPreviewNote(note);
+          }, note.delayMs);
+          this.timerIds.push(id);
+        });
+        this.timerIds.push(setTimeout(() => this.stopPreview(), this.previewDurationMs + 120));
+        this.animatePreviewCursor();
+        return true;
+      }
+
+      getPreviewNotes(rhythm) {
+        const unitBeat = getUnitBeat(rhythm.patternUnit);
+        const bars = rhythm.bars.slice(0, rhythm.previewBars || 2);
+        const notes = [];
+        bars.forEach((bar, barIndex) => {
+          bar.forEach((token, stepIndex) => {
+            const lane = normalizeLaneToken(token);
+            if (!lane) return;
+            notes.push({ lane, delayMs: ((barIndex * bar.length) + stepIndex) * unitBeat * (60000 / rhythm.bpm) });
+          });
+        });
+        return notes;
+      }
+
+      animatePreviewCursor() {
+        if (!this.playing) return;
+        const elapsed = performance.now() - this.previewStartMs;
+        const progress = clamp(elapsed / this.previewDurationMs, 0, 1);
+        this.ui?.updatePreviewCursor(progress);
+        if (progress < 1) this.animationFrame = requestAnimationFrame(() => this.animatePreviewCursor());
+      }
+
+      stopPreview() {
+        this.playToken += 1;
+        this.timerIds.forEach((id) => clearTimeout(id));
+        this.timerIds = [];
+        if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+        this.animationFrame = null;
+        this.playing = false;
+        this.rhythmId = null;
+        this.ui?.updatePreviewCursor(0);
+        this.ui?.setPreviewPlaying(false);
+      }
+
+      isPlaying() {
+        return this.playing;
+      }
+    }
+
+    class RhythmSelectUI {
+      constructor(game, rhythmLibrary, progressManager) {
+        this.game = game;
+        this.rhythmLibrary = rhythmLibrary;
+        this.progressManager = progressManager;
+        this.previewPlayer = null;
+        this.elements = {};
+        this.selectedRhythmId = this.progressManager.getLastSelectedRhythmId() || "intro_basic_pulse";
+        this.filterDifficulty = "all";
+      }
+
+      init() {
+        [
+          "rhythmSelectScreen", "difficultyTabs", "rhythmCardList", "rhythmDetail", "rhythmDetailDifficulty",
+          "rhythmDetailTitle", "rhythmDetailDescription", "rhythmDetailMeta", "rhythmDetailGoal",
+          "rhythmDetailTips", "rhythmDetailRecord", "previewPatternCanvas", "previewCursor",
+          "previewButton", "selectedPracticeButton", "selectedStartButton", "rhythmBackButton",
+        ].forEach((id) => { this.elements[id] = document.getElementById(id); });
+        this.bindEvents();
+        this.renderRhythmCards(this.filterDifficulty);
+        this.selectRhythm(this.selectedRhythmId);
+      }
+
+      setPreviewPlayer(previewPlayer) {
+        this.previewPlayer = previewPlayer;
+      }
+
+      open(rhythmId = null) {
+        if (rhythmId) this.selectedRhythmId = rhythmId;
+        this.renderRhythmCards(this.filterDifficulty);
+        this.selectRhythm(this.selectedRhythmId);
+        this.game.stateManager.set(STATE.RHYTHM_SELECT);
+        this.game.ui.setState(STATE.RHYTHM_SELECT);
+      }
+
+      close() {
+        this.previewPlayer?.stopPreview();
+        this.game.stateManager.set(STATE.READY);
+        this.game.ui.setState(STATE.READY);
+      }
+
+      bindEvents() {
+        this.elements.difficultyTabs.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-difficulty]");
+          if (!button) return;
+          this.filterDifficulty = button.dataset.difficulty;
+          [...this.elements.difficultyTabs.children].forEach((item) => item.classList.toggle("active", item === button));
+          this.renderRhythmCards(this.filterDifficulty);
+        });
+        this.elements.rhythmCardList.addEventListener("click", (event) => {
+          const card = event.target.closest("[data-rhythm-id]");
+          if (card) this.selectRhythm(card.dataset.rhythmId);
+        });
+        this.elements.rhythmCardList.addEventListener("keydown", (event) => {
+          if (!["Enter", "Space"].includes(event.code)) return;
+          const card = event.target.closest("[data-rhythm-id]");
+          if (card) {
+            event.preventDefault();
+            this.selectRhythm(card.dataset.rhythmId);
+          }
+        });
+        this.elements.previewButton.addEventListener("click", () => this.togglePreview());
+        this.elements.selectedPracticeButton.addEventListener("click", () => this.game.startSelectedRhythm("practice"));
+        this.elements.selectedStartButton.addEventListener("click", () => this.game.startSelectedRhythm("normal"));
+        this.elements.rhythmBackButton.addEventListener("click", () => this.close());
+      }
+
+      renderRhythmCards(filterDifficulty = "all") {
+        const recommended = this.rhythmLibrary.getRecommendedNextRhythm(this.selectedRhythmId, null, this.progressManager)?.id;
+        this.elements.rhythmCardList.innerHTML = this.rhythmLibrary.getRhythmsByDifficulty(filterDifficulty).map((rhythm) => {
+          const record = this.progressManager.getBestRecord(rhythm.id);
+          const stars = "★".repeat(rhythm.star);
+          const recommendedBadge = rhythm.id === recommended ? `<span class="recommend-pill">추천</span>` : "";
+          const bestText = record ? `최고 ${record.bestScore.toLocaleString()} · ${record.bestAccuracy.toFixed(1)}%` : "기록 없음";
+          return `
+            <button class="rhythm-card ${rhythm.id === this.selectedRhythmId ? "active" : ""}" type="button" data-rhythm-id="${rhythm.id}">
+              <div class="rhythm-card-top">
+                <strong>${rhythm.titleKo}</strong>
+                <span class="difficulty-pill">${rhythm.difficultyLabel} ${stars}</span>
+              </div>
+              <div class="rhythm-meta">${rhythm.bpm} BPM · ${Math.round(rhythm.durationMs / 1000)}초 · ${this.estimateNoteCount(rhythm)} notes ${recommendedBadge}</div>
+              <div class="record-line">${bestText}</div>
+              <div class="rhythm-tags">${rhythm.tags.slice(0, 3).map((tag) => `<span class="tag-pill">${tag}</span>`).join("")}</div>
+            </button>
+          `;
+        }).join("");
+      }
+
+      renderRhythmDetail(rhythmId) {
+        const rhythm = this.rhythmLibrary.getRhythmById(rhythmId);
+        const record = this.progressManager.getBestRecord(rhythm.id);
+        this.elements.rhythmDetailDifficulty.textContent = `${rhythm.difficultyLabel} ${"★".repeat(rhythm.star)}`;
+        this.elements.rhythmDetailDifficulty.style.background = `${getDifficultyConfig(rhythm.difficulty).color}22`;
+        this.elements.rhythmDetailDifficulty.style.color = getDifficultyConfig(rhythm.difficulty).color;
+        this.elements.rhythmDetailTitle.textContent = rhythm.titleKo;
+        this.elements.rhythmDetailDescription.textContent = rhythm.description;
+        this.elements.rhythmDetailMeta.textContent = `${rhythm.title} · ${rhythm.bpm} BPM · ${Math.round(rhythm.durationMs / 1000)}초 · ${this.estimateNoteCount(rhythm)} notes`;
+        this.elements.rhythmDetailGoal.textContent = rhythm.learningGoal;
+        this.elements.rhythmDetailTips.innerHTML = rhythm.tips?.length
+          ? rhythm.tips.map((tip) => `<li>${tip}</li>`).join("")
+          : `<li>${rhythm.tags.join(" · ")} 흐름으로 천천히 정확도를 올려보세요.</li>`;
+        this.elements.rhythmDetailRecord.textContent = record
+          ? `최고 기록: ${record.bestScore.toLocaleString()}점 · 콤보 ${record.bestCombo} · 정확도 ${record.bestAccuracy.toFixed(1)}% · ${record.bestGrade}`
+          : "아직 기록이 없습니다. 첫 기록을 만들어보세요.";
+        this.drawPatternPreview(rhythm);
+      }
+
+      selectRhythm(rhythmId) {
+        const rhythm = this.rhythmLibrary.getRhythmById(rhythmId);
+        this.previewPlayer?.stopPreview();
+        this.selectedRhythmId = rhythm.id;
+        this.game.selectedRhythmId = rhythm.id;
+        this.progressManager.setLastSelectedRhythmId(rhythm.id);
+        [...this.elements.rhythmCardList.querySelectorAll(".rhythm-card")].forEach((card) => {
+          card.classList.toggle("active", card.dataset.rhythmId === rhythm.id);
+        });
+        this.renderRhythmDetail(rhythm.id);
+      }
+
+      async togglePreview() {
+        const playing = await this.previewPlayer?.playPreview(this.selectedRhythmId);
+        this.setPreviewPlaying(Boolean(playing));
+      }
+
+      setPreviewPlaying(isPlaying) {
+        if (this.elements.previewButton) this.elements.previewButton.textContent = isPlaying ? "미리듣기 정지" : "미리듣기";
+      }
+
+      updatePreviewCursor(progress) {
+        if (this.elements.previewCursor) this.elements.previewCursor.style.left = `${Math.round(progress * 100)}%`;
+      }
+
+      flashPreviewNote() {}
+
+      estimateNoteCount(rhythm) {
+        return rhythm.bars.flat().filter((token) => normalizeLaneToken(token)).length * (rhythm.repeat || 1);
+      }
+
+      drawPatternPreview(rhythm) {
+        const canvas = this.elements.previewPatternCanvas;
+        const ctx = canvas.getContext("2d");
+        const width = canvas.width;
+        const height = canvas.height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "#f8fbf7";
+        ctx.fillRect(0, 0, width, height);
+        const lanes = ["slap", "bass", "tone"];
+        lanes.forEach((lane, index) => {
+          const y = 30 + index * 48;
+          ctx.strokeStyle = "rgba(47,122,99,0.18)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(60, y);
+          ctx.lineTo(width - 20, y);
+          ctx.stroke();
+          ctx.fillStyle = CONFIG.lanes[lane].color;
+          ctx.font = "700 18px system-ui, sans-serif";
+          ctx.fillText(CONFIG.lanes[lane].label, 12, y + 6);
+        });
+        const previewBars = rhythm.bars.slice(0, rhythm.previewBars || 2);
+        const totalSteps = previewBars.reduce((sum, bar) => sum + bar.length, 0);
+        let step = 0;
+        previewBars.forEach((bar) => {
+          bar.forEach((token) => {
+            const lane = normalizeLaneToken(token);
+            if (lane) {
+              const x = 68 + (step / Math.max(1, totalSteps - 1)) * (width - 100);
+              const y = 30 + lanes.indexOf(lane) * 48;
+              ctx.fillStyle = CONFIG.lanes[lane].color;
+              ctx.beginPath();
+              ctx.arc(x, y, 10, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            step += 1;
+          });
+        });
+      }
+    }
+
     class UIManager {
       constructor(calibration) {
         this.calibration = calibration;
@@ -2037,9 +2930,11 @@
       init(assetLoader) {
         const ids = [
           "loadingScreen", "loadingProgress", "loadingText", "loadingIcon", "readyScreen", "heroDrum", "titleIcon",
+          "rhythmSelectScreen",
           "cardSlap", "cardBass", "cardTone", "startButton", "practiceButton", "settingsButton", "helpButton",
           "settingsModal", "settingsClose", "helpModal", "helpClose", "settingsIcon", "helpIcon", "resultScreen",
-          "resultIcon", "resultGrade", "resultGrid", "resultFeedback", "retryButton", "resultPracticeButton",
+          "resultIcon", "resultGrade", "resultRhythmInfo", "resultGrid", "resultRecommendation", "resultFeedback",
+          "retryButton", "resultPracticeButton", "selectRhythmButton", "recommendedRhythmButton",
           "homeButton", "resultSettingsButton", "pauseOverlay", "resumeButton", "practiceToolbar", "practiceHomeButton",
           "practiceSettingsButton", "orientationNote", "masterVolume", "sfxVolume", "bgmVolume", "noteSpeed",
           "inputOffset", "particleQuality", "reducedMotion", "showHitWindows", "masterVolumeLabel", "sfxVolumeLabel",
@@ -2063,19 +2958,21 @@
       }
 
       wire(game) {
-        this.elements.startButton.addEventListener("click", () => game.startGame("tutorial"));
+        this.elements.startButton.addEventListener("click", () => game.openRhythmSelect());
         this.elements.practiceButton.addEventListener("click", () => game.startPractice());
-        this.elements.settingsButton.addEventListener("click", () => this.openSettings());
+        this.elements.settingsButton.addEventListener("click", () => { game.rhythmPreviewPlayer?.stopPreview(); this.openSettings(); });
         this.elements.helpButton.addEventListener("click", () => this.openHelp());
         this.elements.settingsClose.addEventListener("click", () => this.closeSettings());
         this.elements.helpClose.addEventListener("click", () => this.closeHelp());
         this.elements.retryButton.addEventListener("click", () => game.restart());
-        this.elements.resultPracticeButton.addEventListener("click", () => game.startPractice());
+        this.elements.resultPracticeButton.addEventListener("click", () => game.startSelectedRhythm("practice"));
+        this.elements.selectRhythmButton.addEventListener("click", () => game.openRhythmSelect());
+        this.elements.recommendedRhythmButton.addEventListener("click", () => game.openRhythmSelect(game.recommendedRhythmId));
         this.elements.homeButton.addEventListener("click", () => game.goHome());
-        this.elements.resultSettingsButton.addEventListener("click", () => this.openSettings());
+        this.elements.resultSettingsButton.addEventListener("click", () => { game.rhythmPreviewPlayer?.stopPreview(); this.openSettings(); });
         this.elements.resumeButton.addEventListener("click", () => game.resume());
         this.elements.practiceHomeButton.addEventListener("click", () => game.goHome());
-        this.elements.practiceSettingsButton.addEventListener("click", () => this.openSettings());
+        this.elements.practiceSettingsButton.addEventListener("click", () => { game.rhythmPreviewPlayer?.stopPreview(); this.openSettings(); });
         this.wireSettings(game);
       }
 
@@ -2107,6 +3004,7 @@
       setState(state) {
         this.elements.loadingScreen.classList.toggle("active", state === STATE.BOOT);
         this.elements.readyScreen.classList.toggle("active", state === STATE.READY);
+        this.elements.rhythmSelectScreen.classList.toggle("active", state === STATE.RHYTHM_SELECT);
         this.elements.resultScreen.classList.toggle("active", state === STATE.RESULT);
         this.elements.pauseOverlay.classList.toggle("active", state === STATE.PAUSED);
         this.elements.practiceToolbar.classList.toggle("active", state === STATE.PRACTICE);
@@ -2157,6 +3055,9 @@
 
       showResult(data) {
         this.elements.resultGrade.textContent = data.grade;
+        this.elements.resultRhythmInfo.innerHTML = data.rhythm
+          ? `<strong>${data.rhythm.titleKo}</strong> · ${data.rhythm.difficultyLabel} ${"★".repeat(data.rhythm.star)} · ${data.rhythm.bpm} BPM · ${data.mode === "practice" ? "연습 모드" : "일반 모드"}`
+          : "자유 연습 결과";
         this.elements.resultGrid.innerHTML = [
           ["최종 점수", data.score.toLocaleString()],
           ["최고 점수", data.bestScore.toLocaleString()],
@@ -2167,6 +3068,17 @@
           ["Slap 성공률", `${data.laneRates.slap}%`],
           ["Bass · Tone", `${data.laneRates.bass}% · ${data.laneRates.tone}%`],
         ].map(([label, value]) => `<div class="result-stat"><span>${label}</span><strong>${value}</strong></div>`).join("");
+        const record = data.recordUpdate;
+        const recordText = data.mode === "practice"
+          ? "연습 결과는 최고 기록에 저장하지 않았습니다."
+          : [
+              record?.isNewBestScore ? "최고 점수 갱신!" : "",
+              record?.isNewBestAccuracy ? "정확도 기록 갱신!" : "",
+              record?.isNewBestCombo ? "최고 콤보 갱신!" : "",
+            ].filter(Boolean).join(" ") || "기존 최고 기록을 유지했습니다.";
+        this.elements.resultRecommendation.innerHTML = data.recommendedRhythm
+          ? `${recordText}<br />다음 추천 리듬: <strong>${data.recommendedRhythm.titleKo}</strong><br />${data.recommendationText}`
+          : recordText;
         this.elements.resultFeedback.textContent = data.feedback;
       }
 
@@ -2181,7 +3093,9 @@
         this.canvas = document.getElementById("gameCanvas");
         this.calibration = new CalibrationManager();
         this.assetLoader = new AssetLoader(ASSETS);
-        this.chartManager = new ChartManager(CHARTS);
+        this.rhythmLibrary = new RhythmLibrary(RHYTHM_LIBRARY_DATA);
+        this.progressManager = new ProgressManager(STORAGE_KEYS.progress);
+        this.chartManager = new ChartManager(CHARTS, this.rhythmLibrary);
         this.scoring = new ScoringSystem();
         this.noteManager = new NoteManager();
         this.particleSystem = new ParticleSystem(this.calibration);
@@ -2190,7 +3104,15 @@
         this.renderer = new Renderer(this.canvas, this.assetLoader, this.particleSystem, this.calibration);
         this.input = new InputController(this.canvas, this);
         this.ui = new UIManager(this.calibration);
+        this.rhythmSelectUI = new RhythmSelectUI(this, this.rhythmLibrary, this.progressManager);
+        this.rhythmPreviewPlayer = new RhythmPreviewPlayer(this.audio, this.rhythmLibrary, this.rhythmSelectUI);
+        this.rhythmSelectUI.setPreviewPlayer(this.rhythmPreviewPlayer);
         this.currentChart = null;
+        this.currentRhythm = null;
+        this.currentMode = "normal";
+        this.selectedRhythmId = "intro_basic_pulse";
+        this.recommendedRhythmId = null;
+        this.activeJudgement = CONFIG.judgement;
         this.lastFrameAt = performance.now();
         this.startPerformanceMs = 0;
         this.startAudioMs = 0;
@@ -2212,9 +3134,12 @@
 
       async boot() {
         this.calibration.load();
+        this.progressManager.load();
+        this.selectedRhythmId = this.progressManager.getLastSelectedRhythmId() || "intro_basic_pulse";
         this.renderer.resize();
         this.input.attach();
         this.ui.init(this.assetLoader);
+        this.rhythmSelectUI.init();
         this.ui.wire(this);
         this.ui.setState(STATE.BOOT);
         this.ui.updateOrientationNote();
@@ -2238,16 +3163,36 @@
       async startGame(chartId = "tutorial") {
         this.activeChartId = chartId;
         await this.ensureAudio();
-        this.currentChart = this.chartManager.getChart(chartId);
+        this.currentMode = "normal";
+        this.currentRhythm = this.rhythmLibrary.getRhythmById(chartId) || null;
+        this.currentChart = this.currentRhythm ? this.chartManager.loadChartByRhythmId(this.currentRhythm.id) : this.chartManager.getChart(chartId);
+        this.prepareCountdown();
+      }
+
+      async startSelectedRhythm(mode = "normal") {
+        const rhythmId = this.selectedRhythmId || this.progressManager.getLastSelectedRhythmId() || "intro_basic_pulse";
+        const rhythm = this.rhythmLibrary.getRhythmById(rhythmId);
+        this.rhythmPreviewPlayer.stopPreview();
+        this.progressManager.setLastSelectedRhythmId(rhythm.id);
+        await this.ensureAudio();
+        this.currentMode = mode;
+        this.currentRhythm = rhythm;
+        this.activeChartId = rhythm.id;
+        this.currentChart = this.chartManager.loadChartByRhythmId(rhythm.id, { mode, noteSpeed: this.calibration.settings.noteSpeed, inputOffsetMs: this.calibration.getInputOffsetMs() });
+        this.prepareCountdown();
+      }
+
+      prepareCountdown() {
+        this.activeJudgement = this.currentChart?.judgement || CONFIG.judgement;
         this.noteManager.load(this.currentChart);
-        this.scoring.reset(this.currentChart.notes.length);
+        this.scoring.reset(this.currentChart.notes.length, this.activeJudgement);
         this.particleSystem.particles = [];
         this.floatingTexts = [];
         this.practicePatternIndex = 0;
         this.countdownStartedAt = performance.now();
         this.countdownStep = null;
         this.lastCountdownStep = null;
-        this.stateManager.set(STATE.COUNTDOWN);
+        this.stateManager.set(STATE.COUNTDOWN, { rhythmId: this.currentRhythm?.id, mode: this.currentMode });
         this.ui.setState(STATE.COUNTDOWN);
       }
 
@@ -2262,7 +3207,10 @@
       startPractice() {
         this.ensureAudio();
         this.audio.stopBgm();
+        this.rhythmPreviewPlayer.stopPreview();
         this.currentChart = null;
+        this.currentRhythm = null;
+        this.currentMode = "freePractice";
         this.noteManager.reset();
         this.scoring.reset(0);
         this.practicePatternIndex = 0;
@@ -2271,19 +3219,30 @@
       }
 
       restart() {
-        this.startGame(this.activeChartId);
+        if (this.currentRhythm) this.startSelectedRhythm(this.currentMode === "practice" ? "practice" : "normal");
+        else this.startGame(this.activeChartId);
       }
 
       goHome() {
         this.audio.stopBgm();
+        this.rhythmPreviewPlayer.stopPreview();
         this.currentChart = null;
+        this.currentRhythm = null;
+        this.currentMode = "normal";
         this.noteManager.reset();
         this.stateManager.set(STATE.READY);
         this.ui.setState(STATE.READY);
       }
 
+      openRhythmSelect(rhythmId = null) {
+        if (rhythmId) this.selectedRhythmId = rhythmId;
+        this.audio.stopBgm();
+        this.noteManager.reset();
+        this.rhythmSelectUI.open(this.selectedRhythmId);
+      }
+
       handleEnter() {
-        if (this.stateManager.is(STATE.READY)) this.startGame("tutorial");
+        if (this.stateManager.is(STATE.READY)) this.openRhythmSelect();
         else if (this.stateManager.is(STATE.RESULT)) this.restart();
         else if (this.stateManager.is(STATE.PAUSED)) this.resume();
       }
@@ -2317,6 +3276,14 @@
         return Math.max(0, performance.now() - this.startPerformanceMs);
       }
 
+      getApproachTimeMs() {
+        return this.currentChart?.approachTimeMs || this.calibration.getApproachTimeMs();
+      }
+
+      getJudgement() {
+        return this.activeJudgement || CONFIG.judgement;
+      }
+
       getJudgementTimeMs() {
         // 노트 위치는 실제 게임 시간으로, 판정은 사용자가 보정한 offset을 더한 시간으로 계산한다.
         return this.getCurrentGameTimeMs() + this.calibration.getInputOffsetMs();
@@ -2333,7 +3300,7 @@
 
         if (!this.stateManager.is(STATE.PLAYING)) return;
         const judgeTime = this.getJudgementTimeMs();
-        const closest = this.noteManager.findClosest(laneId, judgeTime);
+        const closest = this.noteManager.findClosest(laneId, judgeTime, this.getJudgement().missMs);
         if (!closest) {
           this.addFloatingText("Tap!", CONFIG.lanes[laneId].color, 46, CONFIG.baseWidth / 2, CONFIG.baseHeight * 0.53);
           return;
@@ -2443,7 +3410,7 @@
       updatePlaying() {
         if (!this.stateManager.is(STATE.PLAYING) || !this.currentChart) return;
         const currentTime = this.getCurrentGameTimeMs();
-        const misses = this.noteManager.collectAutoMisses(currentTime);
+        const misses = this.noteManager.collectAutoMisses(currentTime, this.getJudgement().missMs);
         misses.forEach((note) => {
           this.scoring.record(note.lane, "miss");
           const pos = this.renderer.metrics.hitZones[note.lane];
@@ -2458,7 +3425,22 @@
 
       finishGame() {
         this.audio.stopBgm();
-        const data = this.scoring.getResultData();
+        this.rhythmPreviewPlayer.stopPreview();
+        const data = this.scoring.getResultData(this.currentMode !== "practice");
+        data.rhythm = this.currentRhythm;
+        data.mode = this.currentMode;
+        data.recordUpdate = this.currentRhythm
+          ? this.progressManager.updateBestRecord(this.currentRhythm.id, data, this.currentMode)
+          : null;
+        if (data.recordUpdate?.record) {
+          data.bestScore = data.recordUpdate.record.bestScore;
+          data.bestCombo = data.recordUpdate.record.bestCombo;
+        }
+        data.recommendedRhythm = this.currentRhythm
+          ? this.rhythmLibrary.getRecommendedNextRhythm(this.currentRhythm.id, data, this.progressManager)
+          : null;
+        data.recommendationText = this.rhythmLibrary.getRecommendationText(data);
+        this.recommendedRhythmId = data.recommendedRhythm?.id || this.currentRhythm?.id || "intro_basic_pulse";
         this.ui.showResult(data);
         this.stateManager.set(STATE.RESULT);
         this.ui.setState(STATE.RESULT);

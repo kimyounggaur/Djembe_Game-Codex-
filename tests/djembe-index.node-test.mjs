@@ -82,3 +82,52 @@ test("gameplay does not auto-start a djembe rhythm backing track", async () => {
     "starting or resuming gameplay should not launch the djembe rhythm loop automatically",
   );
 });
+
+test("rhythm selection feature exposes the required data, classes, and UI hooks", async () => {
+  const html = await readIndex();
+
+  assert.match(html, /RHYTHM_SELECT:\s*"rhythmSelect"/);
+  assert.match(html, /const\s+DIFFICULTY_CONFIG\s*=/);
+  assert.match(html, /const\s+STORAGE_KEYS\s*=/);
+  assert.match(html, /const\s+RHYTHM_LIBRARY_DATA\s*=\s*\[/);
+
+  [
+    "RhythmLibrary",
+    "ProgressManager",
+    "RhythmPreviewPlayer",
+    "RhythmSelectUI",
+  ].forEach((className) => {
+    assert.match(html, new RegExp(`class\\s+${className}\\b`));
+  });
+
+  [
+    "rhythmSelectScreen",
+    "difficultyTabs",
+    "rhythmCardList",
+    "rhythmDetail",
+    "previewPatternCanvas",
+    "previewButton",
+    "selectedPracticeButton",
+    "selectedStartButton",
+    "rhythmBackButton",
+    "selectRhythmButton",
+    "recommendedRhythmButton",
+  ].forEach((id) => {
+    assert.match(html, new RegExp(`id="${id}"`), `${id} should exist in the HTML`);
+  });
+
+  const rhythmIds = [...html.matchAll(/id:\s*"(intro_|beginner_|intermediate_|advanced_)[^"]+"/g)];
+  assert.ok(rhythmIds.length >= 12, "at least 12 selectable rhythm definitions should be shipped");
+});
+
+test("start flow routes through rhythm selection and supports selected rhythm charts", async () => {
+  const html = await readIndex();
+
+  assert.match(html, /this\.elements\.startButton\.addEventListener\("click",\s*\(\)\s*=>\s*game\.openRhythmSelect\(\)\)/);
+  assert.doesNotMatch(html, /startButton\.addEventListener\("click",\s*\(\)\s*=>\s*game\.startGame\("tutorial"\)\)/);
+  assert.match(html, /loadChartByRhythmId\s*\(/);
+  assert.match(html, /startSelectedRhythm\s*\(\s*mode\s*=\s*"normal"/);
+  assert.match(html, /currentRhythm/);
+  assert.match(html, /currentMode/);
+  assert.match(html, /updateBestRecord\s*\(/);
+});
