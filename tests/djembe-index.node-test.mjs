@@ -146,3 +146,13 @@ test("rhythm selection layout stays readable inside the narrow game frame", asyn
     "desktop viewport rules must not force a two-column rhythm layout inside the 520px game frame",
   );
 });
+
+test("ready screen content is lifted toward the top of the portrait frame", async () => {
+  const html = await readIndex();
+
+  assert.match(html, /#readyScreen\s*\{[\s\S]*?justify-content:\s*flex-start/);
+  assert.match(html, /#readyScreen\s*\{[\s\S]*?padding-top:\s*clamp\(36px,\s*7vh,\s*72px\)/);
+  assert.match(html, /#readyScreen\s+\.learn-card\s*\{[\s\S]*?min-height:\s*96px/);
+  assert.match(html, /#readyScreen\s+\.button-stack\s*\{[\s\S]*?margin-top:\s*clamp\(12px,\s*2vh,\s*18px\)/);
+  assert.match(html, /#readyScreen\s+\.hero-drum\s*\{[\s\S]*?bottom:\s*-12%/);
+});

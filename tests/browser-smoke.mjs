@@ -137,7 +137,16 @@ const readyState = await evaluate(`({
   title: document.title,
   canvas: !!document.getElementById('gameCanvas'),
   readyActive: document.getElementById('readyScreen').classList.contains('active'),
-  state: window.__DJEMBE_GAME__.stateManager.state
+  state: window.__DJEMBE_GAME__.stateManager.state,
+  layout: (() => {
+    const screen = document.getElementById('readyScreen').getBoundingClientRect();
+    const brand = document.querySelector('#readyScreen .brand-row').getBoundingClientRect();
+    const start = document.getElementById('startButton').getBoundingClientRect();
+    return {
+      contentTop: Math.round(brand.top - screen.top),
+      startButtonTop: Math.round(start.top - screen.top)
+    };
+  })()
 })`);
 
 const rect = await evaluate(`(() => {
@@ -259,6 +268,9 @@ console.log(JSON.stringify({ readyState, rhythmState, playState, resultState, pr
 
 if (!readyState.canvas || !readyState.readyActive || readyState.state !== "ready") {
   throw new Error("Ready screen did not initialize correctly");
+}
+if (readyState.layout.contentTop > Math.round(viewportHeight * 0.16) || readyState.layout.startButtonTop > Math.round(viewportHeight * 0.64)) {
+  throw new Error(`Ready screen content is too low: ${JSON.stringify(readyState.layout)}`);
 }
 if (!rhythmState.visible || rhythmState.cardCount < 12) {
   throw new Error("Rhythm selection screen did not show the rhythm library");
