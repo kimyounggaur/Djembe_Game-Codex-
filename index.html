@@ -871,25 +871,37 @@
         const entries = Object.entries(this.manifest.images);
         if (!entries.length) return;
         let completed = 0;
+        const imageTimeoutMs = 8000;
 
         await Promise.all(entries.map(([name, url]) => new Promise((resolve) => {
           const image = new Image();
           image.decoding = "async";
-          image.onload = () => {
-            this.images.set(name, image);
+          image.loading = "eager";
+          let settled = false;
+
+          const finish = (loaded) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timeoutId);
+            this.images.set(name, loaded ? image : null);
+            if (!loaded) {
+              this.failed.push(url);
+            }
             completed += 1;
             this.progress = completed / entries.length;
-            onProgress?.(this.progress, `${name} 로딩 완료`);
+            onProgress?.(this.progress, loaded ? `${name} 로딩 완료` : `${name} fallback 사용`);
             resolve();
           };
+
+          const timeoutId = setTimeout(() => {
+            console.warn(`[AssetLoader] image load timeout, using fallback: ${url}`);
+            finish(false);
+          }, imageTimeoutMs);
+
+          image.onload = () => finish(true);
           image.onerror = () => {
             console.warn(`[AssetLoader] 이미지 누락 또는 로딩 실패: ${url}`);
-            this.images.set(name, null);
-            this.failed.push(url);
-            completed += 1;
-            this.progress = completed / entries.length;
-            onProgress?.(this.progress, `${name} fallback 사용`);
-            resolve();
+            finish(false);
           };
           image.src = url;
         })));
